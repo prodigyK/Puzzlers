@@ -55,17 +55,10 @@ class _PuzzleState extends State<Puzzle> {
       child: GestureDetector(
         onTap: () {
           print(widget.coord);
-          var newCoord = widget.func(widget.puzzleNumber);
-          if (newCoord.x == -1 || newCoord.y == -1) {
-            return;
-          }
-          setState(() {
-            widget.coord = newCoord;
-          });
           if (widget.isShuffled == true) {
             widget.isShuffled = false;
           }
-          print(newCoord);
+          widget.func(widget.puzzleNumber);
         },
         child: Container(
           width: widget.puzzleSize,
@@ -106,7 +99,7 @@ class _PuzzleState extends State<Puzzle> {
                       blurRadius: 1,
                       offset: Offset(-1, -1),
                     ),
-                  ]
+                  ],
                 ),
               ),
             ),

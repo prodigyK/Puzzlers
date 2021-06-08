@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlers/constants/color_consts.dart';
 import 'package:puzzlers/models/coord.dart';
+import 'package:puzzlers/models/position.dart';
 import 'package:puzzlers/providers/update_puzzles.dart';
 import 'package:puzzlers/widgets/puzzle.dart';
 
@@ -34,7 +35,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
     if (!firstInit) {
       var size = MediaQuery.of(context).size;
-      boardSizeOuter = size.width * 0.90;
+      boardSizeOuter = size.width * 0.95;
       boardSizeInner = boardSizeOuter - 20;
       puzzleSize = boardSizeInner / boardSize - 6;
 
@@ -72,7 +73,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
   void _shufflePuzzles() {
     puzzleWidgets.forEach((puzzleWidget) {
-      Coord coord = _getPositionByNumber(puzzleWidget.puzzleNumber);
+      Coord coord = _getCoordByNumber(puzzleWidget.puzzleNumber);
       puzzleWidget.coord = coord;
       puzzleWidget.isShuffled = true;
     });
@@ -126,7 +127,7 @@ class _PlayScreenState extends State<PlayScreen> {
     );
   }
 
-  Coord _getPositionByNumber(int puzzleNumber) {
+  Coord _getCoordByNumber(int puzzleNumber) {
     int posX = -1;
     int posY = -1;
     for (int i = 0; i < boardSize; i++) {
@@ -134,6 +135,7 @@ class _PlayScreenState extends State<PlayScreen> {
         if (matrixPuzzles[i][j] == puzzleNumber) {
           posX = j;
           posY = i;
+          break;
         }
       }
     }
@@ -143,10 +145,7 @@ class _PlayScreenState extends State<PlayScreen> {
     return matrixCoords[posY][posX];
   }
 
-  Coord _calculatePosition(int puzzleNumber) {
-    print(puzzleNumber);
-
-    // Get number position in matrix
+  Position _getPositionByNumber(int puzzleNumber) {
     int posX = -1;
     int posY = -1;
     for (int i = 0; i < boardSize; i++) {
@@ -154,37 +153,83 @@ class _PlayScreenState extends State<PlayScreen> {
         if (matrixPuzzles[i][j] == puzzleNumber) {
           posX = j;
           posY = i;
+          break;
         }
       }
     }
-    assert(posX != -1 && posY != -1);
+    if (posX == -1 || posY == -1) {
+      return Position(-1, -1);
+    }
+    return Position(posX, posY);
+  }
 
-    // Check if empty puzzle is next to it
-    int emptyPosX = -1;
-    int emptyPosY = -1;
-    if (posX > 0 && matrixPuzzles[posY][posX - 1] == 0) {
-      emptyPosX = posX - 1;
-      emptyPosY = posY;
-    } else if (posX < boardSize - 1 && matrixPuzzles[posY][posX + 1] == 0) {
-      emptyPosX = posX + 1;
-      emptyPosY = posY;
-    } else if (posY > 0 && matrixPuzzles[posY - 1][posX] == 0) {
-      emptyPosX = posX;
-      emptyPosY = posY - 1;
-    } else if (posY < boardSize - 1 && matrixPuzzles[posY + 1][posX] == 0) {
-      emptyPosX = posX;
-      emptyPosY = posY + 1;
-    } else {
-      assert(emptyPosX != -1 && emptyPosY != -1);
+  Coord _calculatePosition(int puzzleNumber) {
+    print(puzzleNumber);
+
+    // Get number position in matrix
+    Position numberPos = _getPositionByNumber(puzzleNumber);
+    Position zeroPos = _getPositionByNumber(0);
+
+    bool isHorizontal = false;
+    bool isVertical = false;
+    int posX = numberPos.x;
+    int posY = numberPos.y;
+    int zeroPosX = zeroPos.x;
+    int zeroPosY = zeroPos.y;
+
+    if (posX == -1 || posY == -1) {
       return Coord(-1, -1);
     }
 
-    print(matrixPuzzles);
-    matrixPuzzles[emptyPosY][emptyPosX] = puzzleNumber;
-    matrixPuzzles[posY][posX] = 0;
-    print(matrixPuzzles);
+    if (posX == zeroPosX) {
+      isVertical = true;
+    } else if (posY == zeroPosY) {
+      isHorizontal = true;
+    } else {
+      return Coord(-1, -1);
+    }
 
-    return matrixCoords[emptyPosY][emptyPosX];
+    List<Position> positions = [];
+    if (isHorizontal) {
+      if (posX < zeroPosX) {
+        for (int i = zeroPosX - 1; i >= posX; i--) {
+          int number = matrixPuzzles[posY][i];
+          var puzzle = puzzleWidgets.where((widget) => widget.puzzleNumber == number).first;
+          matrixPuzzles[posY][i] = 0;
+          matrixPuzzles[posY][i + 1] = number;
+          puzzle.coord = matrixCoords[posY][i + 1];
+        }
+      } else if (posX > zeroPosX) {
+        for (int i = zeroPosX + 1; i <= posX; i++) {
+          int number = matrixPuzzles[posY][i];
+          var puzzle = puzzleWidgets.where((widget) => widget.puzzleNumber == number).first;
+          matrixPuzzles[posY][i] = 0;
+          matrixPuzzles[posY][i - 1] = number;
+          puzzle.coord = matrixCoords[posY][i - 1];
+        }
+      }
+    } else if (isVertical) {
+      if (posY < zeroPosY) {
+        for (int i = zeroPosY - 1; i >= posY; i--) {
+          int number = matrixPuzzles[i][posX];
+          var puzzle = puzzleWidgets.where((widget) => widget.puzzleNumber == number).first;
+          matrixPuzzles[i][posX] = 0;
+          matrixPuzzles[i + 1][posX] = number;
+          puzzle.coord = matrixCoords[i + 1][posX];
+        }
+      } else if (posY > zeroPosY) {
+        for (int i = zeroPosY + 1; i <= posY; i++) {
+          int number = matrixPuzzles[i][posX];
+          var puzzle = puzzleWidgets.where((widget) => widget.puzzleNumber == number).first;
+          matrixPuzzles[i][posX] = 0;
+          matrixPuzzles[i - 1][posX] = number;
+          puzzle.coord = matrixCoords[i - 1][posX];
+        }
+      }
+    }
+    Provider.of<UpdatePuzzles>(context, listen: false).update();
+
+    return Coord(-1, -1);
   }
 
   Size _getScreenWidth() {
@@ -210,7 +255,7 @@ class _PlayScreenState extends State<PlayScreen> {
                     top: 40,
                     left: 20,
                     child: GestureDetector(
-                      onTap: (){},
+                      onTap: () {},
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -454,21 +499,16 @@ class _PlayScreenState extends State<PlayScreen> {
                         GestureDetector(
                           onTap: () {
                             print('play is pressed');
-                            if (!isStarted) {
-                              _shuffleArray();
-                              _initMatrixPuzzles();
-                              _shufflePuzzles();
-                            }
-                            setState(() {
-                              isStarted = !isStarted;
-                            });
+                            _shuffleArray();
+                            _initMatrixPuzzles();
+                            _shufflePuzzles();
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               DecoratedIcon(
-                                isStarted ? FontAwesome.stop : FontAwesome5.play,
+                                FontAwesome5.sync_alt,
                                 size: 60,
                                 color: ColorConsts.boardBorderColor,
                                 shadows: [
@@ -490,7 +530,7 @@ class _PlayScreenState extends State<PlayScreen> {
                                 ],
                               ),
                               Text(
-                                isStarted ? 'Stop' : 'Start',
+                                'Restart',
                                 style: GoogleFonts.candal(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -587,14 +627,6 @@ class _PlayScreenState extends State<PlayScreen> {
                       ],
                     ),
                   ),
-                  // ElevatedButton(
-                  //   child: Text('Shuffle'),
-                  //   onPressed: () {
-                  //     _shuffleArray();
-                  //     _initMatrixPuzzles();
-                  //     _shufflePuzzles();
-                  //   },
-                  // )
                 ],
               ),
             ),
