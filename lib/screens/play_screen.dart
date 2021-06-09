@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:decorated_icon/decorated_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
-import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlers/constants/color_consts.dart';
@@ -9,6 +10,7 @@ import 'package:puzzlers/models/coord.dart';
 import 'package:puzzlers/models/position.dart';
 import 'package:puzzlers/providers/update_puzzles.dart';
 import 'package:puzzlers/widgets/puzzle.dart';
+import 'package:sprintf/sprintf.dart';
 
 class PlayScreen extends StatefulWidget {
   @override
@@ -28,6 +30,11 @@ class _PlayScreenState extends State<PlayScreen> {
   double puzzleSize = 0.0;
   bool isMute = false;
   bool isStarted = false;
+  Timer? _timer;
+  String _time = '0:00';
+  int minutes = 0;
+  int seconds = 0;
+  int taps = 0;
 
   @override
   void didChangeDependencies() {
@@ -80,6 +87,12 @@ class _PlayScreenState extends State<PlayScreen> {
     Provider.of<UpdatePuzzles>(context, listen: false).update();
   }
 
+  void _shuffleClear() {
+    puzzleWidgets.forEach((puzzleWidget) {
+      puzzleWidget.isShuffled = false;
+    });
+  }
+
   Future<void> _initMatrixPuzzles() async {
     int index = 0;
     for (int i = 0; i < boardSize; i++) {
@@ -88,8 +101,6 @@ class _PlayScreenState extends State<PlayScreen> {
         index++;
       }
     }
-    print(matrixPuzzles);
-    print(matrixCoords);
   }
 
   void _initMatrixCoords(double boardSizeInner, double puzzleSize, double indent, double distance) {
@@ -122,6 +133,7 @@ class _PlayScreenState extends State<PlayScreen> {
           puzzleNumber: puzzleNumbers[index],
           func: _calculatePosition,
           boardSize: boardSize,
+          updateTaps: _updateTaps,
         );
       },
     );
@@ -163,7 +175,7 @@ class _PlayScreenState extends State<PlayScreen> {
     return Position(posX, posY);
   }
 
-  Coord _calculatePosition(int puzzleNumber) {
+  bool _calculatePosition(int puzzleNumber) {
     print(puzzleNumber);
 
     // Get number position in matrix
@@ -178,7 +190,7 @@ class _PlayScreenState extends State<PlayScreen> {
     int zeroPosY = zeroPos.y;
 
     if (posX == -1 || posY == -1) {
-      return Coord(-1, -1);
+      return false;
     }
 
     if (posX == zeroPosX) {
@@ -186,7 +198,7 @@ class _PlayScreenState extends State<PlayScreen> {
     } else if (posY == zeroPosY) {
       isHorizontal = true;
     } else {
-      return Coord(-1, -1);
+      return false;
     }
 
     List<Position> positions = [];
@@ -229,12 +241,35 @@ class _PlayScreenState extends State<PlayScreen> {
     }
     Provider.of<UpdatePuzzles>(context, listen: false).update();
 
-    return Coord(-1, -1);
+    return true;
   }
 
-  Size _getScreenWidth() {
-    // BuildContext context;
-    return MediaQuery.of(context).size;
+  void _updateTimer(Timer timer) {
+    // int tick = timer.tick % 10;
+    if (seconds == 59) {
+      seconds = 0;
+      minutes++;
+    } else {
+      seconds++;
+    }
+
+    setState(() {
+      _time = sprintf('%d:%02d', [minutes, seconds]);
+    });
+  }
+
+  void _clearTimer() {
+    _timer?.cancel();
+    _time = '0:00';
+    minutes = 0;
+    seconds = 0;
+    taps = 0;
+  }
+
+  void _updateTaps() {
+    setState(() {
+      ++taps;
+    });
   }
 
   @override
@@ -259,53 +294,14 @@ class _PlayScreenState extends State<PlayScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          DecoratedIcon(
-                            FontAwesome5.angle_double_left,
-                            size: 46,
-                            color: ColorConsts.boardBorderColor,
-                            shadows: [
-                              BoxShadow(
-                                blurRadius: 5.0,
-                                color: Colors.black,
-                                offset: Offset(1, 1),
-                              ),
-                              BoxShadow(
-                                blurRadius: 5.0,
-                                color: Colors.black,
-                                offset: Offset(2, 2),
-                              ),
-                              BoxShadow(
-                                blurRadius: 5.0,
-                                color: Colors.black,
-                                offset: Offset(3, 3),
-                              ),
-                            ],
+                          _decoratedIconWidget(
+                            icon: FontAwesome5.angle_double_left,
+                            iconSize: 46,
                           ),
-                          Text(
-                            'Back',
-                            style: GoogleFonts.candal(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: ColorConsts.boardBorderColor,
-                              shadows: [
-                                BoxShadow(
-                                  color: Colors.black,
-                                  blurRadius: 1,
-                                  offset: Offset(0.3, 0.3),
-                                ),
-                                BoxShadow(
-                                  color: Colors.black,
-                                  blurRadius: 1,
-                                  offset: Offset(0.5, 0.5),
-                                ),
-                                BoxShadow(
-                                  color: Colors.black,
-                                  blurRadius: 1,
-                                  offset: Offset(0.7, 0.7),
-                                ),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
+                          _textWidget(
+                            title: 'Back',
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                           ),
                         ],
                       ),
@@ -325,119 +321,37 @@ class _PlayScreenState extends State<PlayScreen> {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              'Time',
-                              style: GoogleFonts.candal(
-                                textStyle: TextStyle(
-                                  color: ColorConsts.boardBorderColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w200,
-                                  shadows: [
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(0.5, 0.5),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(1, 1),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(1.5, 1.5),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            _textWidget(
+                              title: 'Time',
+                              fontSize: 20,
+                              fontWeight: FontWeight.w200,
+                              shadowOffset1: 0.5,
+                              shadowOffset2: 1.0,
+                              shadowOffset3: 1.5,
                             ),
                             Spacer(),
-                            Text(
-                              'Taps',
-                              style: GoogleFonts.candal(
-                                textStyle: TextStyle(
-                                  color: ColorConsts.boardBorderColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w200,
-                                  shadows: [
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(0.5, 0.5),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(1, 1),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(1.5, 1.5),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            _textWidget(
+                              title: 'Taps',
+                              fontSize: 20,
+                              fontWeight: FontWeight.w200,
+                              shadowOffset1: 0.5,
+                              shadowOffset2: 1.0,
+                              shadowOffset3: 1.5,
                             ),
                           ],
                         ),
                         Row(
                           children: [
-                            Text(
-                              '0:00:0',
-                              style: GoogleFonts.candal(
-                                textStyle: TextStyle(
-                                  color: ColorConsts.boardBorderColor,
-                                  fontSize: 50,
-                                  fontWeight: FontWeight.w400,
-                                  shadows: [
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(0.5, 0.5),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(1, 1),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(1.5, 1.5),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            _textWidget(
+                              title: '${_timer != null ? _time : "0:00"}',
+                              fontSize: 50,
+                              fontWeight: FontWeight.w400,
                             ),
                             Spacer(),
-                            Text(
-                              '0',
-                              style: GoogleFonts.candal(
-                                textStyle: TextStyle(
-                                  color: ColorConsts.boardBorderColor,
-                                  fontSize: 50,
-                                  fontWeight: FontWeight.w400,
-                                  shadows: [
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(0.5, 0.5),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(1, 1),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(1.5, 1.5),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            _textWidget(
+                              title: '$taps',
+                              fontSize: 50,
+                              fontWeight: FontWeight.w400,
                             ),
                           ],
                         ),
@@ -498,62 +412,31 @@ class _PlayScreenState extends State<PlayScreen> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            print('play is pressed');
+                            // Shuffle and init arrays
                             _shuffleArray();
                             _initMatrixPuzzles();
                             _shufflePuzzles();
+                            // Timer: clear and create
+                            setState(() {
+                              _clearTimer();
+                            });
+                            Future.delayed(Duration(milliseconds: 1300), () {
+                              _timer = Timer.periodic(Duration(seconds: 1), _updateTimer);
+                              _shuffleClear();
+                            });
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              DecoratedIcon(
-                                FontAwesome5.sync_alt,
-                                size: 60,
-                                color: ColorConsts.boardBorderColor,
-                                shadows: [
-                                  BoxShadow(
-                                    blurRadius: 5.0,
-                                    color: Colors.black,
-                                    offset: Offset(1, 1),
-                                  ),
-                                  BoxShadow(
-                                    blurRadius: 5.0,
-                                    color: Colors.black,
-                                    offset: Offset(2, 2),
-                                  ),
-                                  BoxShadow(
-                                    blurRadius: 5.0,
-                                    color: Colors.black,
-                                    offset: Offset(3, 3),
-                                  ),
-                                ],
+                              _decoratedIconWidget(
+                                icon: FontAwesome5.sync_alt,
+                                iconSize: 60,
                               ),
-                              Text(
-                                'Restart',
-                                style: GoogleFonts.candal(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorConsts.boardBorderColor,
-                                  shadows: [
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(0.3, 0.3),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(0.5, 0.5),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 1,
-                                      offset: Offset(0.7, 0.7),
-                                    ),
-                                  ],
-                                ),
-                                textAlign: TextAlign.center,
+                              _textWidget(
+                                title: 'Restart',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
                             ],
                           ),
@@ -566,59 +449,19 @@ class _PlayScreenState extends State<PlayScreen> {
                               setState(() {
                                 isMute = !isMute;
                               });
-                              print('volume is pressed');
                             },
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                DecoratedIcon(
-                                  isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
-                                  size: 36,
-                                  color: ColorConsts.boardBorderColor,
-                                  shadows: [
-                                    BoxShadow(
-                                      blurRadius: 5.0,
-                                      color: Colors.black,
-                                      offset: Offset(1, 1),
-                                    ),
-                                    BoxShadow(
-                                      blurRadius: 5.0,
-                                      color: Colors.black,
-                                      offset: Offset(2, 2),
-                                    ),
-                                    BoxShadow(
-                                      blurRadius: 5.0,
-                                      color: Colors.black,
-                                      offset: Offset(3, 3),
-                                    ),
-                                  ],
+                                _decoratedIconWidget(
+                                  icon: isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
+                                  iconSize: 36,
                                 ),
-                                Text(
-                                  'Mute',
-                                  style: GoogleFonts.candal(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: ColorConsts.boardBorderColor,
-                                    shadows: [
-                                      BoxShadow(
-                                        color: Colors.black,
-                                        blurRadius: 1,
-                                        offset: Offset(0.3, 0.3),
-                                      ),
-                                      BoxShadow(
-                                        color: Colors.black,
-                                        blurRadius: 1,
-                                        offset: Offset(0.5, 0.5),
-                                      ),
-                                      BoxShadow(
-                                        color: Colors.black,
-                                        blurRadius: 1,
-                                        offset: Offset(0.7, 0.7),
-                                      ),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.center,
+                                _textWidget(
+                                  title: 'Mute',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ],
                             ),
@@ -633,6 +476,73 @@ class _PlayScreenState extends State<PlayScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  DecoratedIcon _decoratedIconWidget({
+    required IconData icon,
+    double iconSize = 24.0,
+    double shadowOffset1 = 1.0,
+    double shadowOffset2 = 2.0,
+    double shadowOffset3 = 3.0,
+    double blurRadius = 5.0,
+  }) {
+    return DecoratedIcon(
+      icon,
+      size: iconSize,
+      color: ColorConsts.boardBorderColor,
+      shadows: [
+        BoxShadow(
+          blurRadius: blurRadius,
+          color: Colors.black,
+          offset: Offset(shadowOffset1, shadowOffset1),
+        ),
+        BoxShadow(
+          blurRadius: blurRadius,
+          color: Colors.black,
+          offset: Offset(shadowOffset2, shadowOffset2),
+        ),
+        BoxShadow(
+          blurRadius: blurRadius,
+          color: Colors.black,
+          offset: Offset(shadowOffset3, shadowOffset3),
+        ),
+      ],
+    );
+  }
+
+  Text _textWidget(
+      {String? title,
+      double? fontSize,
+      FontWeight? fontWeight,
+      double shadowOffset1 = 0.3,
+      double shadowOffset2 = 0.5,
+      double shadowOffset3 = 0.7}) {
+    return Text(
+      '$title',
+      style: GoogleFonts.candal(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        color: ColorConsts.boardBorderColor,
+        shadows: [
+          BoxShadow(
+            color: Colors.black,
+            blurRadius: 1,
+            offset: Offset(shadowOffset1, shadowOffset1),
+          ),
+          BoxShadow(
+            color: Colors.black,
+            blurRadius: 1,
+            offset: Offset(shadowOffset2, shadowOffset2),
+          ),
+          BoxShadow(
+            color: Colors.black,
+            blurRadius: 1,
+            offset: Offset(shadowOffset3, shadowOffset3),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }
