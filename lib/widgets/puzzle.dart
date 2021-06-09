@@ -14,6 +14,7 @@ class Puzzle extends StatefulWidget {
   final Function func;
   bool isShuffled = false;
   final int boardSize;
+  final Function updateTaps;
 
   Puzzle({
     Key? key,
@@ -22,6 +23,7 @@ class Puzzle extends StatefulWidget {
     required this.puzzleNumber,
     required this.func,
     required this.boardSize,
+    required this.updateTaps,
   }) : super(key: key);
 
   @override
@@ -54,11 +56,13 @@ class _PuzzleState extends State<Puzzle> {
       curve: widget.isShuffled ? Curves.easeInOut : Curves.linear,
       child: GestureDetector(
         onTap: () {
-          print(widget.coord);
           if (widget.isShuffled == true) {
             widget.isShuffled = false;
           }
-          widget.func(widget.puzzleNumber);
+          bool result = widget.func(widget.puzzleNumber);
+          if (result) {
+            widget.updateTaps();
+          }
         },
         child: Container(
           width: widget.puzzleSize,
