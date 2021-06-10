@@ -15,6 +15,7 @@ class Puzzle extends StatefulWidget {
   bool isShuffled = false;
   final int boardSize;
   final Function updateTaps;
+  final Function startTimer;
 
   Puzzle({
     Key? key,
@@ -24,6 +25,7 @@ class Puzzle extends StatefulWidget {
     required this.func,
     required this.boardSize,
     required this.updateTaps,
+    required this.startTimer,
   }) : super(key: key);
 
   @override
@@ -52,13 +54,11 @@ class _PuzzleState extends State<Puzzle> {
     return AnimatedPositioned(
       top: y,
       left: x,
-      duration: widget.isShuffled ? Duration(milliseconds: 1300) : Duration(milliseconds: 150),
+      duration: widget.isShuffled ? Duration(milliseconds: 1000) : Duration(milliseconds: 150),
       curve: widget.isShuffled ? Curves.easeInOut : Curves.linear,
       child: GestureDetector(
         onTap: () {
-          if (widget.isShuffled == true) {
-            widget.isShuffled = false;
-          }
+          widget.startTimer();
           bool result = widget.func(widget.puzzleNumber);
           if (result) {
             widget.updateTaps();
@@ -70,7 +70,15 @@ class _PuzzleState extends State<Puzzle> {
           margin: EdgeInsets.all(0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: ColorConsts.boardBorderColor,
+            color: Colors.transparent,
+            image: DecorationImage(
+                image: AssetImage("assets/textures/wood_05.jpg"),
+                fit: BoxFit.contain,
+                colorFilter: const ColorFilter.mode(
+                  Colors.brown,
+                  BlendMode.saturation,
+                ),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black,

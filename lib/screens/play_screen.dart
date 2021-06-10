@@ -9,6 +9,7 @@ import 'package:puzzlers/constants/color_consts.dart';
 import 'package:puzzlers/models/coord.dart';
 import 'package:puzzlers/models/position.dart';
 import 'package:puzzlers/providers/update_puzzles.dart';
+import 'package:puzzlers/providers/update_text_provider.dart';
 import 'package:puzzlers/widgets/puzzle.dart';
 import 'package:sprintf/sprintf.dart';
 
@@ -35,6 +36,8 @@ class _PlayScreenState extends State<PlayScreen> {
   int minutes = 0;
   int seconds = 0;
   int taps = 0;
+  bool isShufflePressed = true;
+  bool isShuffleDisabled = false;
 
   @override
   void didChangeDependencies() {
@@ -42,11 +45,11 @@ class _PlayScreenState extends State<PlayScreen> {
 
     if (!firstInit) {
       var size = MediaQuery.of(context).size;
-      boardSizeOuter = size.width * 0.95;
-      boardSizeInner = boardSizeOuter - 20;
-      puzzleSize = boardSizeInner / boardSize - 6;
+      boardSizeOuter = size.width * 0.98;
+      boardSizeInner = boardSizeOuter - 30;
+      puzzleSize = boardSizeInner / boardSize - 5;
 
-      double leftIndent = 3;
+      double leftIndent = 1;
       double distanceBetweenPuzzles = 4;
       _initMatrixCoords(boardSizeInner, puzzleSize, leftIndent, distanceBetweenPuzzles);
       _generatePuzzleList(puzzleSize);
@@ -134,6 +137,7 @@ class _PlayScreenState extends State<PlayScreen> {
           func: _calculatePosition,
           boardSize: boardSize,
           updateTaps: _updateTaps,
+          startTimer: _startTimer,
         );
       },
     );
@@ -245,7 +249,6 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   void _updateTimer(Timer timer) {
-    // int tick = timer.tick % 10;
     if (seconds == 59) {
       seconds = 0;
       minutes++;
@@ -253,9 +256,23 @@ class _PlayScreenState extends State<PlayScreen> {
       seconds++;
     }
 
-    setState(() {
-      _time = sprintf('%d:%02d', [minutes, seconds]);
-    });
+    var provider = Provider.of<UpdateTextProvider>(context, listen: false);
+    provider.updateTime(sprintf('%d:%02d', [minutes, seconds]));
+  }
+
+  void _updateTaps() {
+    taps++;
+    var provider = Provider.of<UpdateTextProvider>(context, listen: false);
+    provider.updateTaps(taps.toString());
+  }
+
+  void _startTimer() {
+    print('_startTimer isShufflePressed=$isShufflePressed');
+    if (isShufflePressed) {
+      _clearTimer();
+      _timer = Timer.periodic(Duration(seconds: 1), _updateTimer);
+      isShufflePressed = false;
+    }
   }
 
   void _clearTimer() {
@@ -264,216 +281,256 @@ class _PlayScreenState extends State<PlayScreen> {
     minutes = 0;
     seconds = 0;
     taps = 0;
-  }
 
-  void _updateTaps() {
-    setState(() {
-      ++taps;
-    });
+    var provider = Provider.of<UpdateTextProvider>(context, listen: false);
+    provider.updateTime('0:00');
+    provider.updateTaps('0');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorConsts.bgColor,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 80,
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 40,
-                    left: 20,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage("assets/textures/wood_07.jpg"),
+          fit: BoxFit.contain,
+          repeat: ImageRepeat.repeat,
+          colorFilter: const ColorFilter.mode(
+            Colors.white60,
+            BlendMode.softLight,
+          ),
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 80,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: 40,
+                      left: 20,
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            _decoratedIconWidget(
+                              icon: FontAwesome5.angle_double_left,
+                              iconSize: 46,
+                            ),
+                            _textWidget(
+                              title: 'Back',
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
                         children: [
-                          _decoratedIconWidget(
-                            icon: FontAwesome5.angle_double_left,
-                            iconSize: 46,
+                          Row(
+                            children: [
+                              _textWidget(
+                                title: 'Time',
+                                fontSize: 20,
+                                fontWeight: FontWeight.w200,
+                                shadowOffset1: 0.5,
+                                shadowOffset2: 1.0,
+                                shadowOffset3: 1.5,
+                              ),
+                              Spacer(),
+                              _textWidget(
+                                title: 'Taps',
+                                fontSize: 20,
+                                fontWeight: FontWeight.w200,
+                                shadowOffset1: 0.5,
+                                shadowOffset2: 1.0,
+                                shadowOffset3: 1.5,
+                              ),
+                            ],
                           ),
-                          _textWidget(
-                            title: 'Back',
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
+                          Row(
+                            children: [
+                              Consumer<UpdateTextProvider>(
+                                builder: (_, value, child) => _textWidget(
+                                  title: '${_timer != null ? value.time : "0:00"}',
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w400,
+                                  blurRadius: 2,
+                                ),
+                              ),
+                              Spacer(),
+                              Consumer<UpdateTextProvider>(
+                                builder: (_, value, child) => _textWidget(
+                                  title: '$taps',
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w400,
+                                  blurRadius: 2,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
+                    SizedBox(height: 20),
+                    Stack(
                       children: [
-                        Row(
-                          children: [
-                            _textWidget(
-                              title: 'Time',
-                              fontSize: 20,
-                              fontWeight: FontWeight.w200,
-                              shadowOffset1: 0.5,
-                              shadowOffset2: 1.0,
-                              shadowOffset3: 1.5,
-                            ),
-                            Spacer(),
-                            _textWidget(
-                              title: 'Taps',
-                              fontSize: 20,
-                              fontWeight: FontWeight.w200,
-                              shadowOffset1: 0.5,
-                              shadowOffset2: 1.0,
-                              shadowOffset3: 1.5,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            _textWidget(
-                              title: '${_timer != null ? _time : "0:00"}',
-                              fontSize: 50,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            Spacer(),
-                            _textWidget(
-                              title: '$taps',
-                              fontSize: 50,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Stack(
-                    children: [
-                      Container(
-                        width: boardSizeOuter,
-                        height: boardSizeOuter,
-                        decoration: BoxDecoration(
-                          color: ColorConsts.boardBorderColor,
-                          border: Border.all(color: ColorConsts.boardBorderColor),
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.shade900,
-                              blurRadius: 2,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Positioned(
-                        top: 10,
-                        left: 10,
-                        child: Container(
-                          width: boardSizeInner,
-                          height: boardSizeInner,
-                          padding: EdgeInsets.all(0),
+                        Container(
+                          width: boardSizeOuter,
+                          height: boardSizeOuter,
                           decoration: BoxDecoration(
-                            color: ColorConsts.boardBgColor,
+                            color: ColorConsts.boardBorderColor,
                             border: Border.all(color: ColorConsts.boardBorderColor),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(15),
+                            image: DecorationImage(
+                              image: AssetImage("assets/textures/wood_05.jpg"),
+                              fit: BoxFit.contain,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.brown,
+                                BlendMode.saturation,
+                              ),
+                              // repeat: ImageRepeat.repeat
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.grey.shade900,
                                 blurRadius: 2,
-                                offset: Offset(-2, -2),
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            children: puzzleWidgets,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 30),
-                  Container(
-                    width: double.infinity,
-                    height: 100,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            // Shuffle and init arrays
-                            _shuffleArray();
-                            _initMatrixPuzzles();
-                            _shufflePuzzles();
-                            // Timer: clear and create
-                            setState(() {
-                              _clearTimer();
-                            });
-                            Future.delayed(Duration(milliseconds: 1300), () {
-                              _timer = Timer.periodic(Duration(seconds: 1), _updateTimer);
-                              _shuffleClear();
-                            });
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _decoratedIconWidget(
-                                icon: FontAwesome5.sync_alt,
-                                iconSize: 60,
-                              ),
-                              _textWidget(
-                                title: 'Restart',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                offset: Offset(2, 2),
                               ),
                             ],
                           ),
                         ),
                         Positioned(
-                          right: 50,
-                          top: 20,
-                          child: GestureDetector(
-                            onTap: () {
+                          top: 15,
+                          left: 15,
+                          child: Container(
+                            width: boardSizeInner,
+                            height: boardSizeInner,
+                            padding: EdgeInsets.all(0),
+                            decoration: BoxDecoration(
+                              color: ColorConsts.boardBgColor,
+                              border: Border.all(color: ColorConsts.boardBorderColor),
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.shade900,
+                                  blurRadius: 2,
+                                  offset: Offset(-2, -2),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              children: puzzleWidgets,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                    Container(
+                      width: double.infinity,
+                      height: 100,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: isShuffleDisabled ? null : () {
+                              isShufflePressed = true;
                               setState(() {
-                                isMute = !isMute;
+                                isShuffleDisabled = true;
+                              });
+                              // Shuffle and init arrays
+                              _shuffleArray();
+                              _initMatrixPuzzles();
+                              _shufflePuzzles();
+                              // Timer: clear and create
+                              _clearTimer();
+                              Future.delayed(Duration(milliseconds: 1000), () {
+                                _shuffleClear();
+                                setState(() {
+                                  isShuffleDisabled = false;
+                                });
                               });
                             },
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 _decoratedIconWidget(
-                                  icon: isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
-                                  iconSize: 36,
+                                  icon: FontAwesome5.sync_icon,
+                                  iconSize: 50,
+                                  shadowOffset1: 0.5,
+                                  shadowOffset2: 0.5,
+                                  shadowOffset3: 0.5,
+                                  blurRadius: 8,
                                 ),
+                                SizedBox(height: 10),
                                 _textWidget(
-                                  title: 'Mute',
-                                  fontSize: 16,
+                                  title: 'Shuffle',
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ],
                             ),
                           ),
-                        )
-                      ],
+                          Positioned(
+                            right: 50,
+                            top: 20,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isMute = !isMute;
+                                });
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _decoratedIconWidget(
+                                    icon: isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
+                                    iconSize: 36,
+                                    shadowOffset1: 0.5,
+                                    shadowOffset2: 0.5,
+                                    shadowOffset3: 0.5,
+                                    blurRadius: 8,
+                                  ),
+                                  SizedBox(height: 10),
+                                  _textWidget(
+                                    title: 'Mute',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -483,8 +540,8 @@ class _PlayScreenState extends State<PlayScreen> {
     required IconData icon,
     double iconSize = 24.0,
     double shadowOffset1 = 1.0,
-    double shadowOffset2 = 2.0,
-    double shadowOffset3 = 3.0,
+    double shadowOffset2 = 1.5,
+    double shadowOffset3 = 2.0,
     double blurRadius = 5.0,
   }) {
     return DecoratedIcon(
@@ -515,6 +572,7 @@ class _PlayScreenState extends State<PlayScreen> {
       {String? title,
       double? fontSize,
       FontWeight? fontWeight,
+      double blurRadius = 1.0,
       double shadowOffset1 = 0.3,
       double shadowOffset2 = 0.5,
       double shadowOffset3 = 0.7}) {
@@ -527,17 +585,17 @@ class _PlayScreenState extends State<PlayScreen> {
         shadows: [
           BoxShadow(
             color: Colors.black,
-            blurRadius: 1,
+            blurRadius: blurRadius,
             offset: Offset(shadowOffset1, shadowOffset1),
           ),
           BoxShadow(
             color: Colors.black,
-            blurRadius: 1,
+            blurRadius: blurRadius,
             offset: Offset(shadowOffset2, shadowOffset2),
           ),
           BoxShadow(
             color: Colors.black,
-            blurRadius: 1,
+            blurRadius: blurRadius,
             offset: Offset(shadowOffset3, shadowOffset3),
           ),
         ],
