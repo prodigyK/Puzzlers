@@ -32,9 +32,21 @@ class MainScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // SizedBox(height: 70),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildDecoreContainer(title: '8'),
+                    SizedBox(width: 10),
+                    _buildDecoreContainer(title: '15', fontSize: 60, size: 110),
+                    SizedBox(width: 10),
+                    _buildDecoreContainer(title: '24'),
+                  ],
+                ),
+                SizedBox(height: 20),
                 _textWidget(
                   title: 'Puzzlers',
-                  fontSize: 80,
+                  fontSize: 75,
                   fontWeight: FontWeight.w900,
                   shadowOffset1: 0.5,
                   shadowOffset2: 1.0,
@@ -42,11 +54,32 @@ class MainScreen extends StatelessWidget {
                   blurRadius: 6,
                 ),
                 SizedBox(height: 40),
-                buildMenuItem(context: context, title: 'Small  3 x 3', boardSize: BoardSize.SMALL),
+                _buildMenuItem(
+                  context: context,
+                  title: 'Small  3 x 3',
+                  boardSize: BoardSize.SMALL,
+                ),
                 SizedBox(height: 20),
-                buildMenuItem(context: context, title: 'Classic  4 x 4', boardSize: BoardSize.CLASSIC),
+                _buildMenuItem(
+                  context: context,
+                  title: 'Classic  4 x 4',
+                  boardSize: BoardSize.CLASSIC,
+                ),
                 SizedBox(height: 20),
-                buildMenuItem(context: context, title: 'Large  5 x 5', boardSize: BoardSize.LARGE),
+                _buildMenuItem(
+                  context: context,
+                  title: 'Large  5 x 5',
+                  boardSize: BoardSize.LARGE,
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                    )
+                  ],
+                )
               ],
             ),
           ),
@@ -55,8 +88,33 @@ class MainScreen extends StatelessWidget {
     );
   }
 
-  InkWell buildMenuItem(
-      {required BuildContext context, required String title, BoardSize boardSize = BoardSize.CLASSIC}) {
+  Widget _buildDecoreContainer({required String title, double size = 80, double fontSize = 40}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        border: Border.all(width: 3, color: ColorConsts.boardBorderColor),
+        borderRadius: BorderRadius.all(Radius.circular(25)),
+        color: Colors.brown.shade300.withOpacity(0.7),
+      ),
+      child: Center(
+        child: _textWidget(
+          title: '$title',
+          fontSize: fontSize,
+          fontWeight: FontWeight.w500,
+          shadowOffset1: 0.5,
+          shadowOffset2: 1.0,
+          shadowOffset3: 1.5,
+          blurRadius: 6,
+        ),
+      ),
+    );
+  }
+
+  InkWell _buildMenuItem(
+      {required BuildContext context,
+      required String title,
+      BoardSize boardSize = BoardSize.CLASSIC}) {
     var size = MediaQuery.of(context).size;
     return InkWell(
       onTap: () {
@@ -76,7 +134,7 @@ class MainScreen extends StatelessWidget {
       splashColor: ColorConsts.boardBorderColor,
       child: Container(
         width: size.width * 0.9,
-        height: size.height * 0.1,
+        height: size.height * 0.09,
         decoration: BoxDecoration(
           border: Border.all(width: 3, color: ColorConsts.boardBorderColor),
           borderRadius: BorderRadius.all(Radius.circular(25)),
@@ -85,8 +143,8 @@ class MainScreen extends StatelessWidget {
         child: Center(
           child: _textWidget(
             title: '$title',
-            fontSize: 40,
-            fontWeight: FontWeight.w900,
+            fontSize: 35,
+            fontWeight: FontWeight.w400,
             shadowOffset1: 0.5,
             shadowOffset2: 1.0,
             shadowOffset3: 1.5,
@@ -99,12 +157,13 @@ class MainScreen extends StatelessWidget {
 
   Text _textWidget(
       {String? title,
-        double? fontSize,
-        FontWeight? fontWeight,
-        double blurRadius = 1.0,
-        double shadowOffset1 = 0.3,
-        double shadowOffset2 = 0.5,
-        double shadowOffset3 = 0.7}) {
+      double? fontSize,
+      FontWeight? fontWeight,
+      Color? color,
+      double blurRadius = 1.0,
+      double shadowOffset1 = 0.3,
+      double shadowOffset2 = 0.5,
+      double shadowOffset3 = 0.7}) {
     return Text(
       '$title',
       style: GoogleFonts.candal(
