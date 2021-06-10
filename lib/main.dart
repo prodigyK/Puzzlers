@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlers/providers/update_puzzles.dart';
 import 'package:puzzlers/providers/update_text_provider.dart';
+import 'package:puzzlers/screens/main_screen.dart';
 import 'package:puzzlers/screens/play_screen.dart';
 
 void main() {
@@ -21,7 +22,10 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: PlayScreen(),
+        home: MainScreen(),
+        routes: {
+          PlayScreen.routeName: (_) => PlayScreen(),
+        },
       ),
     );
   }

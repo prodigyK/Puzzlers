@@ -14,6 +14,7 @@ import 'package:puzzlers/widgets/puzzle.dart';
 import 'package:sprintf/sprintf.dart';
 
 class PlayScreen extends StatefulWidget {
+  static const routeName = '/play-screen';
   @override
   _PlayScreenState createState() => _PlayScreenState();
 }
@@ -43,14 +44,28 @@ class _PlayScreenState extends State<PlayScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    print('didChangeDependencies boardSize = $boardSize');
     if (!firstInit) {
+      var settings = ModalRoute.of(context)?.settings.arguments as Map<String, int>;
+      boardSize = settings['boardSize'] ?? 4;
+
       var size = MediaQuery.of(context).size;
       boardSizeOuter = size.width * 0.98;
       boardSizeInner = boardSizeOuter - 30;
-      puzzleSize = boardSizeInner / boardSize - 5;
+      var delta = boardSize == 4 ? 5.0 : boardSize == 3 ? 5.3 : 4.8;
+      puzzleSize = boardSizeInner / boardSize - delta;
 
       double leftIndent = 1;
       double distanceBetweenPuzzles = 4;
+
+      puzzleNumbers = List.generate(boardSize * boardSize, (index) => ++index);
+      lineCoords = List.generate(boardSize * boardSize, (index) => Coord(0, 0));
+      puzzleNumbers[puzzleNumbers.length - 1] = 0;
+      matrixPuzzles = List.generate(boardSize, (i) => List.filled(boardSize, 0), growable: false);
+      matrixCoords = List.generate(boardSize, (i) => List.filled(boardSize, Coord(0, 0)), growable: false);
+
+      _shuffleArray();
+      _initMatrixPuzzles();
       _initMatrixCoords(boardSizeInner, puzzleSize, leftIndent, distanceBetweenPuzzles);
       _generatePuzzleList(puzzleSize);
       firstInit = true;
@@ -60,14 +75,9 @@ class _PlayScreenState extends State<PlayScreen> {
   @override
   void initState() {
     super.initState();
+    print('initState boardSize = $boardSize');
 
-    puzzleNumbers = List.generate(boardSize * boardSize, (index) => ++index);
-    lineCoords = List.generate(boardSize * boardSize, (index) => Coord(0, 0));
-    puzzleNumbers[puzzleNumbers.length - 1] = 0;
-    matrixPuzzles = List.generate(boardSize, (i) => List.filled(boardSize, 0), growable: false);
-    matrixCoords = List.generate(boardSize, (i) => List.filled(boardSize, Coord(0, 0)), growable: false);
-    _shuffleArray();
-    _initMatrixPuzzles();
+
   }
 
   void _shuffleArray() {
@@ -317,7 +327,10 @@ class _PlayScreenState extends State<PlayScreen> {
                       top: 40,
                       left: 20,
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          _clearTimer();
+                          Navigator.of(context).pop();
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
