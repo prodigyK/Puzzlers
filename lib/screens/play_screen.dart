@@ -81,14 +81,16 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   void _shuffleArray() {
-    puzzleNumbers.shuffle();
-    for (int i = 0; i < puzzleNumbers.length - 1; i++) {
-      if (puzzleNumbers[i] == 0) {
-        puzzleNumbers[i] = puzzleNumbers[i + 1];
-        puzzleNumbers[i + 1] = 0;
+    do {
+      puzzleNumbers.shuffle();
+      for (int i = 0; i < puzzleNumbers.length - 1; i++) {
+        if (puzzleNumbers[i] == 0) {
+          puzzleNumbers[i] = puzzleNumbers[i + 1];
+          puzzleNumbers[i + 1] = 0;
+        }
       }
-    }
-    print(puzzleNumbers);
+      print(puzzleNumbers);
+    } while (!_checkMatrixResolvable());
   }
 
   void _shufflePuzzles() {
@@ -114,6 +116,21 @@ class _PlayScreenState extends State<PlayScreen> {
         index++;
       }
     }
+  }
+
+  bool _checkMatrixResolvable() {
+    int count = 0;
+    for (int i = 0; i < boardSize * boardSize; i++) {
+      if(puzzleNumbers[i] == 0) continue;
+
+      for (int j = 0; j < i; j++) {
+        if (puzzleNumbers[j] > puzzleNumbers[i]) {
+          count++;
+        }
+      }
+    }
+    count += boardSize + boardSize;
+    return (count % 2 == 0);
   }
 
   void _initMatrixCoords(double boardSizeInner, double puzzleSize, double indent, double distance) {
@@ -190,8 +207,6 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   bool _calculatePosition(int puzzleNumber) {
-    print(puzzleNumber);
-
     // Get number position in matrix
     Position numberPos = _getPositionByNumber(puzzleNumber);
     Position zeroPos = _getPositionByNumber(0);
@@ -277,7 +292,6 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   void _startTimer() {
-    print('_startTimer isShufflePressed=$isShufflePressed');
     if (isShufflePressed) {
       _clearTimer();
       _timer = Timer.periodic(Duration(seconds: 1), _updateTimer);
@@ -466,24 +480,26 @@ class _PlayScreenState extends State<PlayScreen> {
                         alignment: Alignment.center,
                         children: [
                           GestureDetector(
-                            onTap: isShuffleDisabled ? null : () {
-                              isShufflePressed = true;
-                              setState(() {
-                                isShuffleDisabled = true;
-                              });
-                              // Shuffle and init arrays
-                              _shuffleArray();
-                              _initMatrixPuzzles();
-                              _shufflePuzzles();
-                              // Timer: clear and create
-                              _clearTimer();
-                              Future.delayed(Duration(milliseconds: 1000), () {
-                                _shuffleClear();
-                                setState(() {
-                                  isShuffleDisabled = false;
-                                });
-                              });
-                            },
+                            onTap: isShuffleDisabled
+                                ? null
+                                : () {
+                                    isShufflePressed = true;
+                                    setState(() {
+                                      isShuffleDisabled = true;
+                                    });
+                                    // Shuffle and init arrays
+                                    _shuffleArray();
+                                    _initMatrixPuzzles();
+                                    _shufflePuzzles();
+                                    // Timer: clear and create
+                                    _clearTimer();
+                                    Future.delayed(Duration(milliseconds: 1000), () {
+                                      _shuffleClear();
+                                      setState(() {
+                                        isShuffleDisabled = false;
+                                      });
+                                    });
+                                  },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
