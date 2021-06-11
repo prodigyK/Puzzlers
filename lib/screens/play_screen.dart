@@ -302,7 +302,7 @@ class _PlayScreenState extends State<PlayScreen> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage("assets/textures/wood_07.jpg"),
+          image: AssetImage("assets/textures/wood_02.jpg"),
           fit: BoxFit.contain,
           repeat: ImageRepeat.repeat,
           colorFilter: const ColorFilter.mode(

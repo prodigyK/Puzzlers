@@ -16,7 +16,7 @@ class MainScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage("assets/textures/wood_07.jpg"),
+          image: AssetImage("assets/textures/wood_02.jpg"),
           fit: BoxFit.contain,
           repeat: ImageRepeat.repeat,
           colorFilter: const ColorFilter.mode(
@@ -32,7 +32,6 @@ class MainScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // SizedBox(height: 70),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -43,7 +42,6 @@ class MainScreen extends StatelessWidget {
                     _buildDecoreContainer(title: '24'),
                   ],
                 ),
-                SizedBox(height: 20),
                 _textWidget(
                   title: 'Puzzlers',
                   fontSize: 75,
@@ -53,7 +51,7 @@ class MainScreen extends StatelessWidget {
                   shadowOffset3: 1.5,
                   blurRadius: 6,
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 80),
                 _buildMenuItem(
                   context: context,
                   title: 'Small  3 x 3',
@@ -95,7 +93,7 @@ class MainScreen extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(width: 3, color: ColorConsts.boardBorderColor),
         borderRadius: BorderRadius.all(Radius.circular(25)),
-        color: Colors.brown.shade300.withOpacity(0.7),
+        color: Colors.brown.shade300.withOpacity(0.6),
       ),
       child: Center(
         child: _textWidget(
@@ -138,7 +136,7 @@ class MainScreen extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(width: 3, color: ColorConsts.boardBorderColor),
           borderRadius: BorderRadius.all(Radius.circular(25)),
-          color: Colors.brown.shade300.withOpacity(0.3),
+          color: Colors.brown.shade300.withOpacity(0.2),
         ),
         child: Center(
           child: _textWidget(
