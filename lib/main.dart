@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlers/providers/update_puzzles.dart';
 import 'package:puzzlers/providers/update_text_provider.dart';
@@ -23,8 +24,18 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: MainScreen(),
-        routes: {
-          PlayScreen.routeName: (_) => PlayScreen(),
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/play-screen':
+              return PageTransition(
+                child: PlayScreen(),
+                type: PageTransitionType.fade,
+                settings: settings,
+              );
+              break;
+            default:
+              return null;
+          }
         },
       ),
     );
