@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:decorated_icon/decorated_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
@@ -39,6 +40,7 @@ class _PlayScreenState extends State<PlayScreen> {
   int taps = 0;
   bool isShufflePressed = true;
   bool isShuffleDisabled = false;
+  final audioPlayer = AudioCache();
 
   @override
   void didChangeDependencies() {
@@ -121,7 +123,7 @@ class _PlayScreenState extends State<PlayScreen> {
   bool _checkMatrixResolvable() {
     int count = 0;
     for (int i = 0; i < boardSize * boardSize; i++) {
-      if(puzzleNumbers[i] == 0) continue;
+      if (puzzleNumbers[i] == 0) continue;
 
       for (int j = 0; j < i; j++) {
         if (puzzleNumbers[j] > puzzleNumbers[i]) {
@@ -165,6 +167,7 @@ class _PlayScreenState extends State<PlayScreen> {
           boardSize: boardSize,
           updateTaps: _updateTaps,
           startTimer: _startTimer,
+          soundPlay: _soundPlay,
         );
       },
     );
@@ -309,6 +312,12 @@ class _PlayScreenState extends State<PlayScreen> {
     var provider = Provider.of<UpdateTextProvider>(context, listen: false);
     provider.updateTime('0:00');
     provider.updateTaps('0');
+  }
+
+  void _soundPlay() async {
+    if (!isMute) {
+      await audioPlayer.play('sounds/baseball.wav');
+    }
   }
 
   @override
@@ -541,12 +550,6 @@ class _PlayScreenState extends State<PlayScreen> {
                                     shadowOffset2: 0.5,
                                     shadowOffset3: 0.5,
                                     blurRadius: 8,
-                                  ),
-                                  SizedBox(height: 10),
-                                  _textWidget(
-                                    title: 'Mute',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ],
                               ),

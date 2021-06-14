@@ -16,6 +16,7 @@ class Puzzle extends StatefulWidget {
   final int boardSize;
   final Function updateTaps;
   final Function startTimer;
+  final Function soundPlay;
 
   Puzzle({
     Key? key,
@@ -26,6 +27,7 @@ class Puzzle extends StatefulWidget {
     required this.boardSize,
     required this.updateTaps,
     required this.startTimer,
+    required this.soundPlay,
   }) : super(key: key);
 
   @override
@@ -33,6 +35,7 @@ class Puzzle extends StatefulWidget {
 }
 
 class _PuzzleState extends State<Puzzle> {
+
   double x = -1;
   double y = -1;
 
@@ -62,6 +65,7 @@ class _PuzzleState extends State<Puzzle> {
           bool result = widget.func(widget.puzzleNumber);
           if (result) {
             widget.updateTaps();
+            widget.soundPlay();
           }
         },
         child: Container(
@@ -72,12 +76,12 @@ class _PuzzleState extends State<Puzzle> {
             borderRadius: BorderRadius.circular(10),
             color: Colors.transparent,
             image: DecorationImage(
-                image: AssetImage("assets/textures/wood_05.jpg"),
-                fit: BoxFit.contain,
-                colorFilter: const ColorFilter.mode(
-                  Colors.brown,
-                  BlendMode.saturation,
-                ),
+              image: AssetImage("assets/textures/wood_05.jpg"),
+              fit: BoxFit.contain,
+              colorFilter: const ColorFilter.mode(
+                Colors.brown,
+                BlendMode.saturation,
+              ),
             ),
             boxShadow: [
               BoxShadow(
