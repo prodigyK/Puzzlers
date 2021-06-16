@@ -54,7 +54,7 @@ class _PlayScreenState extends State<PlayScreen> {
       var size = MediaQuery.of(context).size;
       boardSizeOuter = size.width * 0.98;
       boardSizeInner = boardSizeOuter - 30;
-      var delta = boardSize == 4 ? 5.0 : boardSize == 3 ? 5.3 : 4.8;
+      var delta = boardSize == 4 ? 5.0 : boardSize == 3 ? 5.3 : boardSize == 5 ? 4.8 : 4.6;
       puzzleSize = boardSizeInner / boardSize - delta;
 
       double leftIndent = 1;
@@ -446,7 +446,7 @@ class _PlayScreenState extends State<PlayScreen> {
                           decoration: BoxDecoration(
                             color: ColorConsts.boardBorderColor,
                             border: Border.all(color: ColorConsts.boardBorderColor),
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(25),
                             image: DecorationImage(
                               image: AssetImage("assets/textures/wood_05.jpg"),
                               fit: BoxFit.contain,
@@ -459,15 +459,15 @@ class _PlayScreenState extends State<PlayScreen> {
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.grey.shade900,
-                                blurRadius: 2,
-                                offset: Offset(2, 2),
+                                blurRadius: 1,
+                                offset: Offset(1, 1),
                               ),
                             ],
                           ),
                         ),
                         Positioned(
-                          top: 15,
-                          left: 15,
+                          top: 16,
+                          left: 16,
                           child: Container(
                             width: boardSizeInner,
                             height: boardSizeInner,

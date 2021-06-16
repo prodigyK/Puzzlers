@@ -106,7 +106,7 @@ class _PuzzleState extends State<Puzzle> {
               style: GoogleFonts.candal(
                 textStyle: TextStyle(
                   color: ColorConsts.boardBgColor,
-                  fontSize: widget.boardSize == 4 ? 55 : widget.boardSize == 5 ? 40 : 65,
+                  fontSize: widget.boardSize == 4 ? 55 : widget.boardSize == 5 ? 40 : widget.boardSize == 6 ? 33 : 65,
                   fontWeight: FontWeight.w800,
                   shadows: [
                     BoxShadow(

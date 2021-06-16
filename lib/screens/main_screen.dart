@@ -7,6 +7,7 @@ enum BoardSize {
   SMALL,
   CLASSIC,
   LARGE,
+  PRO,
 }
 
 class MainScreen extends StatelessWidget {
@@ -32,16 +33,6 @@ class MainScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildDecoreContainer(title: '8'),
-                    SizedBox(width: 10),
-                    _buildDecoreContainer(title: '15', fontSize: 60, size: 110),
-                    SizedBox(width: 10),
-                    _buildDecoreContainer(title: '24'),
-                  ],
-                ),
                 _textWidget(
                   title: 'Puzzlers',
                   fontSize: 75,
@@ -51,7 +42,7 @@ class MainScreen extends StatelessWidget {
                   shadowOffset3: 1.5,
                   blurRadius: 6,
                 ),
-                SizedBox(height: 80),
+                SizedBox(height: 40),
                 _buildMenuItem(
                   context: context,
                   title: 'Small  3 x 3',
@@ -70,14 +61,12 @@ class MainScreen extends StatelessWidget {
                   boardSize: BoardSize.LARGE,
                 ),
                 SizedBox(height: 20),
-                Row(
-                  children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                    )
-                  ],
-                )
+                _buildMenuItem(
+                  context: context,
+                  title: 'Pro  6 x 6',
+                  boardSize: BoardSize.PRO,
+                ),
+                SizedBox(height: 20),
               ],
             ),
           ),
@@ -126,13 +115,16 @@ class MainScreen extends StatelessWidget {
           case BoardSize.LARGE:
             Navigator.of(context).pushNamed(PlayScreen.routeName, arguments: {'boardSize': 5});
             break;
+          case BoardSize.PRO:
+            Navigator.of(context).pushNamed(PlayScreen.routeName, arguments: {'boardSize': 6});
+            break;
         }
       },
       overlayColor: MaterialStateProperty.all(ColorConsts.boardBorderColor),
       splashColor: ColorConsts.boardBorderColor,
       child: Container(
         width: size.width * 0.9,
-        height: size.height * 0.09,
+        height: size.height * 0.08,
         decoration: BoxDecoration(
           border: Border.all(width: 3, color: ColorConsts.boardBorderColor),
           borderRadius: BorderRadius.all(Radius.circular(25)),
