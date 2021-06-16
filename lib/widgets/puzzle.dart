@@ -58,14 +58,13 @@ class _PuzzleState extends State<Puzzle> {
       top: y,
       left: x,
       duration: widget.isShuffled ? Duration(milliseconds: 1000) : Duration(milliseconds: 150),
-      curve: widget.isShuffled ? Curves.easeInOut : Curves.linear,
+      curve: widget.isShuffled ? Curves.easeInOut : Curves.easeOut,
       child: GestureDetector(
         onTap: () {
           widget.startTimer();
           bool result = widget.func(widget.puzzleNumber);
           if (result) {
             widget.updateTaps();
-            widget.soundPlay();
           }
         },
         child: Container(

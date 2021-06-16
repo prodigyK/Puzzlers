@@ -40,7 +40,7 @@ class _PlayScreenState extends State<PlayScreen> {
   int taps = 0;
   bool isShufflePressed = true;
   bool isShuffleDisabled = false;
-  final audioPlayer = AudioCache();
+  AudioCache audioCache = AudioCache();
 
   @override
   void didChangeDependencies() {
@@ -271,6 +271,7 @@ class _PlayScreenState extends State<PlayScreen> {
         }
       }
     }
+    _soundPlay();
     Provider.of<UpdatePuzzles>(context, listen: false).update();
 
     return true;
@@ -316,8 +317,17 @@ class _PlayScreenState extends State<PlayScreen> {
 
   void _soundPlay() async {
     if (!isMute) {
-      await audioPlayer.play('sounds/baseball.wav');
+      audioCache.duckAudio = true;
+      audioCache.play('sounds/arm_09.wav', mode: PlayerMode.LOW_LATENCY);
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print('PlayScreen dispose()');
+    audioCache..clearAll();
+    _timer?.cancel();
   }
 
   @override
@@ -508,6 +518,8 @@ class _PlayScreenState extends State<PlayScreen> {
                                         isShuffleDisabled = false;
                                       });
                                     });
+                                    audioCache.clearAll();
+                                    audioCache = AudioCache();
                                   },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

@@ -60,7 +60,7 @@ flutter:
     - assets/textures/wood_05.jpg
     - assets/textures/wood_06.jpg
     - assets/textures/wood_07.jpg
-    - assets/sounds/baseball.wav
+    - assets/sounds/arm_09.wav
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
