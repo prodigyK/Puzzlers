@@ -16,7 +16,6 @@ class Puzzle extends StatefulWidget {
   final int boardSize;
   final Function updateTaps;
   final Function startTimer;
-  final Function soundPlay;
 
   Puzzle({
     Key? key,
@@ -27,7 +26,6 @@ class Puzzle extends StatefulWidget {
     required this.boardSize,
     required this.updateTaps,
     required this.startTimer,
-    required this.soundPlay,
   }) : super(key: key);
 
   @override
@@ -57,7 +55,7 @@ class _PuzzleState extends State<Puzzle> {
     return AnimatedPositioned(
       top: y,
       left: x,
-      duration: widget.isShuffled ? Duration(milliseconds: 1000) : Duration(milliseconds: 150),
+      duration: widget.isShuffled ? Duration(milliseconds: 1000) : Duration(milliseconds: 100),
       curve: widget.isShuffled ? Curves.easeInOut : Curves.easeOut,
       child: GestureDetector(
         onTap: () {

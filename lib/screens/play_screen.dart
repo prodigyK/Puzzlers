@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:decorated_icon/decorated_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -13,9 +13,11 @@ import 'package:puzzlers/providers/update_puzzles.dart';
 import 'package:puzzlers/providers/update_text_provider.dart';
 import 'package:puzzlers/widgets/puzzle.dart';
 import 'package:sprintf/sprintf.dart';
+import 'package:soundpool/soundpool.dart';
 
 class PlayScreen extends StatefulWidget {
   static const routeName = '/play-screen';
+
   @override
   _PlayScreenState createState() => _PlayScreenState();
 }
@@ -40,7 +42,15 @@ class _PlayScreenState extends State<PlayScreen> {
   int taps = 0;
   bool isShufflePressed = true;
   bool isShuffleDisabled = false;
-  AudioCache audioCache = AudioCache();
+  Soundpool? pool;
+  int? soundId;
+
+  final buttonRadius = 25.0;
+  final buttonBlur = 10.0;
+  final buttonElevation = 3.0;
+  final buttonShadow = 1.0;
+  final buttonBgImage = 'assets/textures/wood_09.jpg';
+  final backgroundImage = 'assets/textures/wood_02.jpg';
 
   @override
   void didChangeDependencies() {
@@ -78,8 +88,8 @@ class _PlayScreenState extends State<PlayScreen> {
   void initState() {
     super.initState();
     print('initState boardSize = $boardSize');
-
-
+    pool = Soundpool.fromOptions(options: SoundpoolOptions(streamType: StreamType.notification));
+    _loadSound().then((value) => soundId = value);
   }
 
   void _shuffleArray() {
@@ -167,7 +177,6 @@ class _PlayScreenState extends State<PlayScreen> {
           boardSize: boardSize,
           updateTaps: _updateTaps,
           startTimer: _startTimer,
-          soundPlay: _soundPlay,
         );
       },
     );
@@ -271,7 +280,7 @@ class _PlayScreenState extends State<PlayScreen> {
         }
       }
     }
-    _soundPlay();
+    _playSound();
     Provider.of<UpdatePuzzles>(context, listen: false).update();
 
     return true;
@@ -315,10 +324,14 @@ class _PlayScreenState extends State<PlayScreen> {
     provider.updateTaps('0');
   }
 
-  void _soundPlay() async {
+  Future<int?> _loadSound() async {
+    var asset = await rootBundle.load("assets/sounds/arm_09.wav");
+    return await pool?.load(asset);
+  }
+
+  void _playSound() async {
     if (!isMute) {
-      audioCache.duckAudio = true;
-      audioCache.play('sounds/arm_09.wav', mode: PlayerMode.LOW_LATENCY);
+      await pool?.play(soundId!);
     }
   }
 
@@ -326,8 +339,8 @@ class _PlayScreenState extends State<PlayScreen> {
   void dispose() {
     super.dispose();
     print('PlayScreen dispose()');
-    audioCache..clearAll();
     _timer?.cancel();
+    pool?.release();
   }
 
   @override
@@ -335,7 +348,7 @@ class _PlayScreenState extends State<PlayScreen> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage("assets/textures/wood_02.jpg"),
+          image: AssetImage(backgroundImage),
           fit: BoxFit.contain,
           repeat: ImageRepeat.repeat,
           colorFilter: const ColorFilter.mode(
@@ -491,15 +504,66 @@ class _PlayScreenState extends State<PlayScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 30),
-                    Container(
-                      width: double.infinity,
-                      height: 100,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: isShuffleDisabled
+                    SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                            image: DecorationImage(
+                              image: AssetImage(buttonBgImage),
+                              fit: BoxFit.contain,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.brown,
+                                BlendMode.screen,
+                              ),
+                            ),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              elevation: MaterialStateProperty.all(buttonElevation),
+                              // side: MaterialStateProperty.all(BorderSide(width: 1, color: Colors.brown)),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                                ),
+                              ),
+                            ),
+                            child: _decoratedIconWidget(
+                              icon: FontAwesome5.info,
+                              iconSize: 36,
+                              shadowOffset1: -0.5,
+                              shadowOffset2: -1,
+                              shadowOffset3: -1,
+                              blurRadius: 0,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 110,
+                          height: 110,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                            image: DecorationImage(
+                              image: AssetImage(buttonBgImage),
+                              fit: BoxFit.cover,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.brown,
+                                // BlendMode.dst,
+                                // BlendMode.lighten,
+                                // BlendMode.luminosity,
+                                BlendMode.screen,
+                                // BlendMode.saturation,
+                              ),
+                            ),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: isShuffleDisabled
                                 ? null
                                 : () {
                                     isShufflePressed = true;
@@ -518,57 +582,90 @@ class _PlayScreenState extends State<PlayScreen> {
                                         isShuffleDisabled = false;
                                       });
                                     });
-                                    audioCache.clearAll();
-                                    audioCache = AudioCache();
                                   },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              elevation: MaterialStateProperty.all(buttonElevation),
+                              // side: MaterialStateProperty.all(BorderSide(width: 2, color: Colors.brown)),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                                ),
+                              ),
+                            ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 _decoratedIconWidget(
                                   icon: FontAwesome5.sync_icon,
-                                  iconSize: 50,
-                                  shadowOffset1: 0.5,
-                                  shadowOffset2: 0.5,
-                                  shadowOffset3: 0.5,
-                                  blurRadius: 8,
+                                  iconSize: 36,
+                                  shadowOffset1: -0.5,
+                                  shadowOffset2: -1,
+                                  shadowOffset3: -1,
+                                  blurRadius: 0,
                                 ),
                                 SizedBox(height: 10),
-                                _textWidget(
-                                  title: 'Shuffle',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                Text(
+                                  'Shuffle',
+                                  style: GoogleFonts.candal(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorConsts.boardBgColor,
+                                    shadows: [
+                                      BoxShadow(
+                                        color: Colors.black,
+                                        blurRadius: 0,
+                                        offset: Offset(-1, -1),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          Positioned(
-                            right: 50,
-                            top: 20,
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isMute = !isMute;
-                                });
-                              },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _decoratedIconWidget(
-                                    icon: isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
-                                    iconSize: 36,
-                                    shadowOffset1: 0.5,
-                                    shadowOffset2: 0.5,
-                                    shadowOffset3: 0.5,
-                                    blurRadius: 8,
-                                  ),
-                                ],
+                        ),
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                            image: DecorationImage(
+                              image: AssetImage(buttonBgImage),
+                              fit: BoxFit.contain,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.brown,
+                                BlendMode.screen,
                               ),
                             ),
-                          )
-                        ],
-                      ),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                isMute = !isMute;
+                              });
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              elevation: MaterialStateProperty.all(buttonElevation),
+                              // side: MaterialStateProperty.all(BorderSide(width: 1, color: Colors.brown)),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                                ),
+                              ),
+                            ),
+                            child: _decoratedIconWidget(
+                              icon: isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
+                              iconSize: 36,
+                              shadowOffset1: -0.5,
+                              shadowOffset2: -1,
+                              shadowOffset3: -1,
+                              blurRadius: 0,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -591,7 +688,7 @@ class _PlayScreenState extends State<PlayScreen> {
     return DecoratedIcon(
       icon,
       size: iconSize,
-      color: ColorConsts.boardBorderColor,
+      color: ColorConsts.boardBgColor,
       shadows: [
         BoxShadow(
           blurRadius: blurRadius,

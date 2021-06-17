@@ -34,7 +34,7 @@ dependencies:
   decorated_icon: ^1.2.0
   sprintf: ^6.0.0
   page_transition: ^2.0.2
-  audioplayers: ^0.19.0
+  soundpool: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +60,23 @@ flutter:
     - assets/textures/wood_05.jpg
     - assets/textures/wood_06.jpg
     - assets/textures/wood_07.jpg
+#    - assets/textures/wood_08.jpg
+    - assets/textures/wood_09.jpg
+#    - assets/textures/wood_10.jpg
+#    - assets/textures/wooden_01.jpg
+#    - assets/textures/break_01.jpg
+#    - assets/textures/grass_01.jpg
+#    - assets/textures/heaven_01.jpg
+#    - assets/textures/leather_01.jpg
+#    - assets/textures/leather_02.jpg
+#    - assets/textures/sand_01.jpg
+#    - assets/textures/steel_01.jpg
+#    - assets/textures/stone_01.jpg
+#    - assets/textures/stone_02.jpg
+#    - assets/textures/stone_03.jpg
+#    - assets/textures/tears_01.jpg
     - assets/sounds/arm_09.wav
+    - assets/sounds/arm_099.wav
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
