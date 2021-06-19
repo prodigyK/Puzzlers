@@ -46,11 +46,13 @@ class _PlayScreenState extends State<PlayScreen> {
   int? soundId;
 
   final buttonRadius = 25.0;
-  final buttonBlur = 10.0;
+  final buttonBlur = 5.0;
   final buttonElevation = 3.0;
   final buttonShadow = 1.0;
   final buttonBgImage = 'assets/textures/wood_09.jpg';
   final backgroundImage = 'assets/textures/wood_02.jpg';
+  static const Color buttonColor = Colors.brown;
+  static const BlendMode buttonBlendMode = BlendMode.screen;
 
   @override
   void didChangeDependencies() {
@@ -345,6 +347,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -489,6 +492,15 @@ class _PlayScreenState extends State<PlayScreen> {
                               color: ColorConsts.boardBgColor,
                               border: Border.all(color: ColorConsts.boardBorderColor),
                               borderRadius: BorderRadius.circular(10),
+                              image: DecorationImage(
+                                image: AssetImage("assets/textures/wood_02.jpg"),
+                                fit: BoxFit.contain,
+                                repeat: ImageRepeat.repeat,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.white60,
+                                  BlendMode.softLight,
+                                ),
+                              ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.grey.shade900,
@@ -511,158 +523,191 @@ class _PlayScreenState extends State<PlayScreen> {
                         Container(
                           width: 80,
                           height: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
-                            image: DecorationImage(
-                              image: AssetImage(buttonBgImage),
-                              fit: BoxFit.contain,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.brown,
-                                BlendMode.screen,
-                              ),
-                            ),
-                          ),
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                              elevation: MaterialStateProperty.all(buttonElevation),
-                              // side: MaterialStateProperty.all(BorderSide(width: 1, color: Colors.brown)),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                                    image: DecorationImage(
+                                      image: AssetImage(buttonBgImage),
+                                      fit: BoxFit.cover,
+                                      colorFilter: const ColorFilter.mode(
+                                        buttonColor,
+                                        buttonBlendMode,
+                                      ),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.shade900,
+                                        blurRadius: 5,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: _decoratedIconWidget(
+                                      icon: FontAwesome5.info,
+                                      iconSize: 36,
+                                      shadowOffset1: -0.5,
+                                      shadowOffset2: 0,
+                                      shadowOffset3: 0),
                                 ),
                               ),
-                            ),
-                            child: _decoratedIconWidget(
-                              icon: FontAwesome5.info,
-                              iconSize: 36,
-                              shadowOffset1: -0.5,
-                              shadowOffset2: -1,
-                              shadowOffset3: -1,
-                              blurRadius: 0,
-                            ),
+                              Positioned.fill(
+                                bottom: 0,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                                    onTap: () {},
+                                    highlightColor: Colors.brown.shade300.withOpacity(0.7),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Container(
-                          width: 110,
+                          width: size.width * 0.4,
                           height: 110,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
-                            image: DecorationImage(
-                              image: AssetImage(buttonBgImage),
-                              fit: BoxFit.cover,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.brown,
-                                // BlendMode.dst,
-                                // BlendMode.lighten,
-                                // BlendMode.luminosity,
-                                BlendMode.screen,
-                                // BlendMode.saturation,
-                              ),
-                            ),
-                          ),
-                          child: ElevatedButton(
-                            onPressed: isShuffleDisabled
-                                ? null
-                                : () {
-                                    isShufflePressed = true;
-                                    setState(() {
-                                      isShuffleDisabled = true;
-                                    });
-                                    // Shuffle and init arrays
-                                    _shuffleArray();
-                                    _initMatrixPuzzles();
-                                    _shufflePuzzles();
-                                    // Timer: clear and create
-                                    _clearTimer();
-                                    Future.delayed(Duration(milliseconds: 1000), () {
-                                      _shuffleClear();
-                                      setState(() {
-                                        isShuffleDisabled = false;
-                                      });
-                                    });
-                                  },
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                              elevation: MaterialStateProperty.all(buttonElevation),
-                              // side: MaterialStateProperty.all(BorderSide(width: 2, color: Colors.brown)),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
-                                ),
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                _decoratedIconWidget(
-                                  icon: FontAwesome5.sync_icon,
-                                  iconSize: 36,
-                                  shadowOffset1: -0.5,
-                                  shadowOffset2: -1,
-                                  shadowOffset3: -1,
-                                  blurRadius: 0,
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  'Shuffle',
-                                  style: GoogleFonts.candal(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: ColorConsts.boardBgColor,
-                                    shadows: [
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                                    image: DecorationImage(
+                                      image: AssetImage(buttonBgImage),
+                                      fit: BoxFit.contain,
+                                      repeat: ImageRepeat.repeat,
+                                      colorFilter: const ColorFilter.mode(
+                                        buttonColor,
+                                        buttonBlendMode,
+                                      ),
+                                    ),
+                                    boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black,
+                                        color: Colors.grey.shade900,
+                                        blurRadius: 5,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      _decoratedIconWidget(
+                                        icon: FontAwesome5.sync_icon,
+                                        iconSize: 44,
+                                        shadowOffset1: -0.5,
+                                        shadowOffset2: -1,
+                                        shadowOffset3: 0,
                                         blurRadius: 0,
-                                        offset: Offset(-1, -1),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        'Shuffle',
+                                        style: GoogleFonts.candal(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: ColorConsts.boardBgColor,
+                                          shadows: [
+                                            BoxShadow(
+                                              color: Colors.black,
+                                              blurRadius: 0,
+                                              offset: Offset(-1, -1),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                              Positioned.fill(
+                                bottom: 0,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                                    onTap: isShuffleDisabled
+                                        ? null
+                                        : () {
+                                      isShufflePressed = true;
+                                      setState(() {
+                                        isShuffleDisabled = true;
+                                      });
+                                      // Shuffle and init arrays
+                                      _shuffleArray();
+                                      _initMatrixPuzzles();
+                                      _shufflePuzzles();
+                                      // Timer: clear and create
+                                      _clearTimer();
+                                      Future.delayed(Duration(milliseconds: 1000), () {
+                                        _shuffleClear();
+                                        setState(() {
+                                          isShuffleDisabled = false;
+                                        });
+                                      });
+                                    },
+                                    highlightColor: Colors.brown.shade300.withOpacity(0.7),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Container(
                           width: 80,
                           height: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
-                            image: DecorationImage(
-                              image: AssetImage(buttonBgImage),
-                              fit: BoxFit.contain,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.brown,
-                                BlendMode.screen,
-                              ),
-                            ),
-                          ),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                isMute = !isMute;
-                              });
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                              elevation: MaterialStateProperty.all(buttonElevation),
-                              // side: MaterialStateProperty.all(BorderSide(width: 1, color: Colors.brown)),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(buttonRadius)),
+                                    image: DecorationImage(
+                                      image: AssetImage(buttonBgImage),
+                                      fit: BoxFit.contain,
+                                      colorFilter: const ColorFilter.mode(
+                                        buttonColor,
+                                        buttonBlendMode,
+                                      ),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.shade900,
+                                        blurRadius: 5,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: _decoratedIconWidget(
+                                    icon: isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
+                                    iconSize: 36,
+                                    shadowOffset1: -0.5,
+                                    shadowOffset2: 0,
+                                    shadowOffset3: 0,
+                                  ),
                                 ),
                               ),
-                            ),
-                            child: _decoratedIconWidget(
-                              icon: isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
-                              iconSize: 36,
-                              shadowOffset1: -0.5,
-                              shadowOffset2: -1,
-                              shadowOffset3: -1,
-                              blurRadius: 0,
-                            ),
+                              Positioned.fill(
+                                bottom: 0,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                                    onTap: () {
+                                      setState(() {
+                                        isMute = !isMute;
+                                      });
+                                    },
+                                    highlightColor: Colors.brown.shade300.withOpacity(0.7),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -677,7 +722,7 @@ class _PlayScreenState extends State<PlayScreen> {
     );
   }
 
-  DecoratedIcon _decoratedIconWidget({
+  Widget _decoratedIconWidget({
     required IconData icon,
     double iconSize = 24.0,
     double shadowOffset1 = 1.0,
@@ -685,38 +730,39 @@ class _PlayScreenState extends State<PlayScreen> {
     double shadowOffset3 = 2.0,
     double blurRadius = 5.0,
   }) {
-    return DecoratedIcon(
-      icon,
-      size: iconSize,
-      color: ColorConsts.boardBgColor,
-      shadows: [
-        BoxShadow(
-          blurRadius: blurRadius,
-          color: Colors.black,
-          offset: Offset(shadowOffset1, shadowOffset1),
-        ),
-        BoxShadow(
-          blurRadius: blurRadius,
-          color: Colors.black,
-          offset: Offset(shadowOffset2, shadowOffset2),
-        ),
-        BoxShadow(
-          blurRadius: blurRadius,
-          color: Colors.black,
-          offset: Offset(shadowOffset3, shadowOffset3),
-        ),
-      ],
+    return Center(
+      child: DecoratedIcon(
+        icon,
+        size: iconSize,
+        color: ColorConsts.boardBgColor,
+        shadows: [
+          BoxShadow(
+            blurRadius: blurRadius,
+            color: Colors.black,
+            offset: Offset(shadowOffset1, shadowOffset1),
+          ),
+          BoxShadow(
+            blurRadius: blurRadius,
+            color: Colors.black,
+            offset: Offset(shadowOffset2, shadowOffset2),
+          ),
+          BoxShadow(
+            blurRadius: blurRadius,
+            color: Colors.black,
+            offset: Offset(shadowOffset3, shadowOffset3),
+          ),
+        ],
+      ),
     );
   }
 
-  Text _textWidget(
-      {String? title,
-      double? fontSize,
-      FontWeight? fontWeight,
-      double blurRadius = 1.0,
-      double shadowOffset1 = 0.3,
-      double shadowOffset2 = 0.5,
-      double shadowOffset3 = 0.7}) {
+  Text _textWidget({String? title,
+    double? fontSize,
+    FontWeight? fontWeight,
+    double blurRadius = 1.0,
+    double shadowOffset1 = 0.3,
+    double shadowOffset2 = 0.5,
+    double shadowOffset3 = 0.7}) {
     return Text(
       '$title',
       style: GoogleFonts.candal(
