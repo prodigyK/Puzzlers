@@ -240,7 +240,7 @@ class MainScreen extends StatelessWidget {
     var size = MediaQuery.of(context).size;
     return Container(
       width: size.width * 0.9,
-      height: size.height * 0.08,
+      height: size.height * 0.06,
       child: Stack(
         children: [
           Positioned.fill(
@@ -260,16 +260,16 @@ class MainScreen extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    blurRadius: 5,
-                    offset: Offset(1, 1),
+                    color: Colors.black38,
+                    blurRadius: 2,
+                    offset: Offset(2, 2),
                   ),
                 ],
               ),
               child: Center(
                 child: _textWidget2(
                   title: '$title',
-                  fontSize: 35,
+                  fontSize: 25,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -343,11 +343,7 @@ class MainScreen extends StatelessWidget {
   }
 
   Text _textWidget2(
-      {String? title,
-        double? fontSize,
-        FontWeight? fontWeight,
-        double blurRadius = 1.0,
-        double shadowOffset1 = -0.7}) {
+      {String? title, double? fontSize, FontWeight? fontWeight, double blurRadius = 1.0, double shadowOffset1 = 0.7}) {
     return Text(
       '$title',
       style: GoogleFonts.candal(
