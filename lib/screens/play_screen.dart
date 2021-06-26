@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:decorated_icon/decorated_icon.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
@@ -637,7 +638,6 @@ class _PlayScreenState extends State<PlayScreen> {
                                     Colors.brown,
                                     BlendMode.saturation,
                                   ),
-                                  // repeat: ImageRepeat.repeat
                                 ),
                                 boxShadow: [
                                   BoxShadow(
@@ -688,8 +688,8 @@ class _PlayScreenState extends State<PlayScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
-                              width: 80,
-                              height: 80,
+                              width: 70,
+                              height: 70,
                               child: Stack(
                                 children: [
                                   Positioned.fill(
@@ -714,8 +714,9 @@ class _PlayScreenState extends State<PlayScreen> {
                                       ),
                                       child: _decoratedIconWidget(
                                           icon: FontAwesome5.info,
-                                          iconSize: 36,
-                                          shadowOffset1: -0.5,
+                                          iconSize: 30,
+                                          blurRadius: 0,
+                                          shadowOffset1: 0,
                                           shadowOffset2: 0,
                                           shadowOffset3: 0),
                                     ),
@@ -735,8 +736,8 @@ class _PlayScreenState extends State<PlayScreen> {
                               ),
                             ),
                             Container(
-                              width: size.width * 0.4,
-                              height: 110,
+                              width: 100,
+                              height: 100,
                               child: Stack(
                                 children: [
                                   Positioned.fill(
@@ -765,27 +766,20 @@ class _PlayScreenState extends State<PlayScreen> {
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           _decoratedIconWidget(
-                                            icon: FontAwesome5.sync_icon,
-                                            iconSize: 44,
-                                            shadowOffset1: -0.5,
-                                            shadowOffset2: -1,
+                                            icon: CupertinoIcons.arrow_2_circlepath,//FontAwesome5.sync_icon,
+                                            iconSize: 50,
+                                            shadowOffset1: 0,
+                                            shadowOffset2: 0,
                                             shadowOffset3: 0,
                                             blurRadius: 0,
                                           ),
-                                          SizedBox(height: 10),
+                                          SizedBox(height: 5),
                                           Text(
                                             'Shuffle',
                                             style: GoogleFonts.candal(
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                               color: ColorConsts.boardBgColor,
-                                              shadows: [
-                                                BoxShadow(
-                                                  color: Colors.black,
-                                                  blurRadius: 0,
-                                                  offset: Offset(-1, -1),
-                                                ),
-                                              ],
                                             ),
                                           ),
                                         ],
@@ -807,8 +801,8 @@ class _PlayScreenState extends State<PlayScreen> {
                               ),
                             ),
                             Container(
-                              width: 80,
-                              height: 80,
+                              width: 70,
+                              height: 70,
                               child: Stack(
                                 children: [
                                   Positioned.fill(
@@ -833,8 +827,9 @@ class _PlayScreenState extends State<PlayScreen> {
                                       ),
                                       child: _decoratedIconWidget(
                                         icon: isMute ? FontAwesome5.volume_mute : FontAwesome5.volume_up,
-                                        iconSize: 36,
-                                        shadowOffset1: -0.5,
+                                        iconSize: 30,
+                                        blurRadius: 0,
+                                        shadowOffset1: 0,
                                         shadowOffset2: 0,
                                         shadowOffset3: 0,
                                       ),
