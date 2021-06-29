@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlers/constants/color_consts.dart';
-import 'package:puzzlers/providers/update_puzzles.dart';
+import 'package:puzzlers/providers/update_puzzles_provider.dart';
+import 'package:puzzlers/widgets/custom_button.dart';
+import 'package:puzzlers/widgets/custom_text.dart';
 
-typedef MyFuncAction = void Function();
 enum Device {
   ProMax,
   Pro,
@@ -16,7 +16,7 @@ enum Device {
 const Map<Device, Map<String, double>> devicesHeight = const {
   Device.ProMax: {
     'height': 896,
-    'coef': 0.43,
+    'coef': 0.41,
   },
   Device.Pro: {
     'height': 844,
@@ -35,6 +35,8 @@ const Map<Device, Map<String, double>> devicesHeight = const {
     'coef': 0.53,
   },
 };
+
+final String bodyImage = 'assets/textures/wood_02.jpg';
 
 class Congratulations extends StatefulWidget {
   bool isVisible = false;
@@ -57,8 +59,6 @@ class Congratulations extends StatefulWidget {
 }
 
 class _CongratulationsState extends State<Congratulations> {
-  final String buttonImage = 'assets/textures/wood_09.jpg';
-  final String bodyImage = 'assets/textures/wood_02.jpg';
   final int duration = 200;
 
   Device _checkDevice(double height) {
@@ -81,7 +81,7 @@ class _CongratulationsState extends State<Congratulations> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     Device device = _checkDevice(size.height);
-    Provider.of<UpdatePuzzles>(context);
+    Provider.of<UpdatePuzzlesProvider>(context);
     return AnimatedOpacity(
       duration: Duration(milliseconds: duration),
       opacity: widget.isVisible ? 1.0 : 0.0,
@@ -91,7 +91,6 @@ class _CongratulationsState extends State<Congratulations> {
             width: size.width,
             height: size.height,
             decoration: BoxDecoration(
-              // color: Colors.brown.shade300.withOpacity(0.9),
               color: Colors.black12.withOpacity(0.7),
             ),
           ),
@@ -127,7 +126,6 @@ class _CongratulationsState extends State<Congratulations> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // SizedBox(height: 30),
                           Container(
                             height: 65,
                             decoration: BoxDecoration(
@@ -136,20 +134,14 @@ class _CongratulationsState extends State<Congratulations> {
                                   BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
                             ),
                             child: Center(
-                              child: Text(
-                                'Congratulations',
-                                style: GoogleFonts.candal(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorConsts.boardBgColor,
-                                  shadows: [
-                                    BoxShadow(
-                                      color: Colors.black,
-                                      blurRadius: 2,
-                                      offset: Offset(0.5, 0.5),
-                                    ),
-                                  ],
-                                ),
+                              child: CustomText(
+                                title: 'Congratulations',
+                                fontSize: 25,
+                                fontFamily: 'Candal',
+                                fontWeight: FontWeight.bold,
+                                color: ColorConsts.textColor,
+                                blurRadius: 2.0,
+                                shadowOffset1: 0.5,
                               ),
                             ),
                           ),
@@ -160,20 +152,16 @@ class _CongratulationsState extends State<Congratulations> {
                                 ? Colors.green.shade400.withOpacity(0.15)
                                 : Colors.indigo.shade400.withOpacity(0.15),
                             child: widget.isBetter
-                                ? _textWidget(
+                                ? CustomText(
                                     title: 'Your current result is the best one!',
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.green.shade700,
-                                    blurRadius: 0.0,
-                                    shadowOffset1: 0.0,
                                   )
-                                : _textWidget(
+                                : CustomText(
                                     title: 'Do as few moves as possible!',
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
-                                    blurRadius: 0,
-                                    shadowOffset1: 0.0,
                                     color: Colors.indigo,
                                   ),
                           ),
@@ -186,7 +174,7 @@ class _CongratulationsState extends State<Congratulations> {
                             ),
                           ),
                           Spacer(),
-                          _button(
+                          CustomButton(
                             title: 'Play again',
                             onPressed: () {
                               setState(() {
@@ -198,8 +186,9 @@ class _CongratulationsState extends State<Congratulations> {
                             },
                           ),
                           SizedBox(height: 1),
-                          _button(
+                          CustomButton(
                             title: 'Go to Menu',
+                            textColor: Colors.red.shade100,
                             bottomBoarder: 25,
                             onPressed: () {
                               widget.goToMenu();
@@ -219,67 +208,29 @@ class _CongratulationsState extends State<Congratulations> {
     );
   }
 
-  Widget _buildResultTable() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Container(
-              // width: 60,
-              // height: 30,
-              child: _textWidget(
-                title: 'Scores',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Container(
-              // width: 60,
-              // height: 30,
-              child: _textWidget(
-                title: 'Taps',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Container(
-              // width: 60,
-              // height: 30,
-              child: _textWidget(
-                title: 'Time',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        )
-      ]
-    );
-  }
-
   DataTable _buildDataTable() {
     return DataTable(
       horizontalMargin: 16.0,
       dividerThickness: 2,
       columnSpacing: 30,
-      showBottomBorder: true,
+      showBottomBorder: false,
       columns: [
         DataColumn(
-          label: _textWidget(
+          label: CustomText(
             title: 'Scores',
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         DataColumn(
-          label: _textWidget(
+          label: CustomText(
             title: 'Taps',
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         DataColumn(
-          label: _textWidget(
+          label: CustomText(
             title: 'Time',
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -288,16 +239,16 @@ class _CongratulationsState extends State<Congratulations> {
       ],
       rows: [
         DataRow(cells: [
-          DataCell(_textWidget(title: 'Current', fontSize: 16)),
+          DataCell(CustomText(title: 'Current', fontSize: 16)),
           DataCell(
-            _textWidget(
+            CustomText(
               title: '${widget.currentScore["taps"]}',
               fontSize: 24,
               color: widget.isBetter ? Colors.green.shade700 : Colors.indigo,
             ),
           ),
           DataCell(
-            _textWidget(
+            CustomText(
               title: '${widget.currentScore["time"]}',
               fontSize: 20,
               color: widget.isBetter ? Colors.green.shade700 : Colors.indigo,
@@ -305,121 +256,21 @@ class _CongratulationsState extends State<Congratulations> {
           ),
         ]),
         DataRow(cells: [
-          DataCell(_textWidget(title: 'Best', fontSize: 16)),
+          DataCell(CustomText(title: 'Best', fontSize: 16)),
           DataCell(
-            _textWidget(
+            CustomText(
               title: '${widget.bestScore["taps"]}',
               fontSize: 24,
             ),
           ),
           DataCell(
-            _textWidget(
+            CustomText(
               title: '${widget.bestScore["time"]}',
               fontSize: 20,
             ),
           ),
         ]),
       ],
-    );
-  }
-
-  Widget _button({required String title, required MyFuncAction onPressed, double bottomBoarder = 0}) {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(bottomBoarder),
-                  bottomRight: Radius.circular(bottomBoarder),
-                ),
-                image: DecorationImage(
-                  image: AssetImage(buttonImage),
-                  fit: BoxFit.contain,
-                  repeat: ImageRepeat.repeat,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.brown,
-                    BlendMode.screen,
-                  ),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black,
-                    blurRadius: 1,
-                    spreadRadius: 0,
-                    offset: Offset(1, 1),
-                  ),
-                  BoxShadow(
-                    color: Colors.black,
-                    blurRadius: 1,
-                    spreadRadius: 0,
-                    offset: Offset(1, 1),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  '$title',
-                  style: GoogleFonts.candal(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: ColorConsts.boardBgColor,
-                    shadows: [
-                      BoxShadow(
-                        color: Colors.black,
-                        blurRadius: 2,
-                        offset: Offset(0.5, 0.5),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            bottom: 0,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                // borderRadius: BorderRadius.all(Radius.circular(25)),
-                onTap: onPressed,
-                highlightColor: Colors.brown.shade300.withOpacity(0.7),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _textWidget({
-    String? title,
-    double? fontSize,
-    Color color = const Color(0xFF795548), //Color(0xFF5D4037),
-    FontWeight? fontWeight = FontWeight.normal,
-    double blurRadius = 1.0,
-    double shadowOffset1 = 0.2,
-  }) {
-    return Center(
-      child: Text(
-        '$title',
-        style: GoogleFonts.balooTammudu(
-          fontSize: fontSize,
-          fontWeight: fontWeight,
-          color: color,
-          shadows: [
-            BoxShadow(
-              color: Colors.black,
-              blurRadius: blurRadius,
-              offset: Offset(shadowOffset1, shadowOffset1),
-            ),
-          ],
-        ),
-        textAlign: TextAlign.center,
-      ),
     );
   }
 }

@@ -3,8 +3,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlers/constants/color_consts.dart';
+import 'package:puzzlers/models/board.dart';
 import 'package:puzzlers/models/coord.dart';
-import 'package:puzzlers/providers/update_puzzles.dart';
+import 'package:puzzlers/providers/update_puzzles_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Puzzle extends StatefulWidget {
@@ -33,25 +34,27 @@ class Puzzle extends StatefulWidget {
 }
 
 class _PuzzleState extends State<Puzzle> {
-
   double x = -1;
   double y = -1;
+  Map<Board, double> fontSizes = {
+    Board.THREE: 65,
+    Board.FOUR: 55,
+    Board.FIVE: 40,
+    Board.SIX: 33,
+  };
+  Board? board;
 
-  Future<void> updateCoord(Coord newCoord) async {
-    setState(() {
-      widget.coord = newCoord;
-    });
-  }
-
-  void updateShuffle([bool value = false]) {
-    widget.isShuffled = value;
+  void initState() {
+    super.initState();
+    board = Board.values.first.board(widget.boardSize);
   }
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<UpdatePuzzles>(context);
+    Provider.of<UpdatePuzzlesProvider>(context);
     x = widget.coord.x;
     y = widget.coord.y;
+
     return AnimatedPositioned(
       top: y,
       left: x,
@@ -103,8 +106,8 @@ class _PuzzleState extends State<Puzzle> {
               '${widget.puzzleNumber}',
               style: GoogleFonts.candal(
                 textStyle: TextStyle(
-                  color: ColorConsts.boardBgColor,
-                  fontSize: widget.boardSize == 4 ? 55 : widget.boardSize == 5 ? 40 : widget.boardSize == 6 ? 33 : 65,
+                  color: ColorConsts.textColor,
+                  fontSize: fontSizes[board],
                   fontWeight: FontWeight.w800,
                   shadows: [
                     BoxShadow(

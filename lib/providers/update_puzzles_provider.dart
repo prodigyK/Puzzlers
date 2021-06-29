@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-class UpdatePuzzles with ChangeNotifier {
+class UpdatePuzzlesProvider with ChangeNotifier {
 
   void update() {
     notifyListeners();
