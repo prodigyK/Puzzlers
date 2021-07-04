@@ -16,7 +16,7 @@ class CustomText extends StatelessWidget {
   CustomText({
     required this.title,
     required this.fontSize,
-    this.color = const Color(0xFF795548),
+    this.color = const Color(0xFF6D4C41),
     this.fontWeight = FontWeight.normal,
     this.fontFamily = 'Baloo Tammudu',
     this.blurRadius = 0.0,

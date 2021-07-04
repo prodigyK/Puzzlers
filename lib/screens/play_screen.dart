@@ -12,12 +12,14 @@ import 'package:puzzlers/models/position.dart';
 import 'package:puzzlers/providers/update_puzzles_provider.dart';
 import 'package:puzzlers/providers/update_timer_provider.dart';
 import 'package:puzzlers/utils/calc_util.dart';
+import 'package:puzzlers/utils/screen_util.dart';
 import 'package:puzzlers/utils/stats_util.dart';
 import 'package:puzzlers/widgets/congratulation.dart';
 import 'package:puzzlers/widgets/custom_decorated_button.dart';
 import 'package:puzzlers/widgets/custom_navigation_button.dart';
 import 'package:puzzlers/widgets/custom_text.dart';
 import 'package:puzzlers/widgets/puzzle.dart';
+import 'package:puzzlers/widgets/statistics.dart';
 import 'package:sprintf/sprintf.dart';
 import 'package:soundpool/soundpool.dart';
 
@@ -55,6 +57,8 @@ class _PlayScreenState extends State<PlayScreen> {
     Board.SIX: 4.6,
   };
   final backgroundImage = 'assets/textures/wood_02.jpg';
+  bool isStatisticsOpen = false;
+  bool isStatisticsAnimatedSwitch = false;
 
   @override
   void didChangeDependencies() {
@@ -248,6 +252,11 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   void _congratulate() async {
+    await StatsUtil.getStats(boardSize: boardSize).then((stat) async {
+      if (stat['games'] == null || stat['games'] == 0) {
+        await StatsUtil.resetStats(boardSize: boardSize);
+      }
+    });
     var timerProvider = Provider.of<UpdateTimerProvider>(context, listen: false);
     timerProvider.cancel();
     var bestScore = await StatsUtil.getBestScore(boardSize);
@@ -271,7 +280,6 @@ class _PlayScreenState extends State<PlayScreen> {
         'time': currentTime,
       },
     );
-    print('currentTaps=$currentTaps');
     // Update statistics
     await StatsUtil.updateStats(boardSize: boardSize, currentTaps: currentTaps, currentTime: currentTime);
     StatsUtil.getStats(boardSize: boardSize).then((value) => print(value));
@@ -515,7 +523,12 @@ class _PlayScreenState extends State<PlayScreen> {
                               height: 70,
                               icon: IconConsts.info,
                               iconSize: 30,
-                              onTap: () {},
+                              onTap: () {
+                                setState(() {
+                                  isStatisticsOpen = true;
+                                  isStatisticsAnimatedSwitch = true;
+                                });
+                              },
                             ),
                             CustomDecoratedButton(
                               title: 'Shuffle',
@@ -547,6 +560,30 @@ class _PlayScreenState extends State<PlayScreen> {
             Visibility(
               visible: isCongratulate,
               child: Center(child: congratulationWidget),
+            ),
+            AnimatedOpacity(
+              duration: Duration(milliseconds: 200),
+              opacity: isStatisticsAnimatedSwitch ? 1.0 : 0.0,
+              child: Visibility(
+                visible: isStatisticsOpen,
+                child: Statistics(
+                  boardSize: boardSize,
+                  device: ScreenUtil.checkDevice(size.height),
+                  closeDialog: () {
+                    setState(() {
+                      isStatisticsAnimatedSwitch = false;
+                    });
+                    Future.delayed(Duration(milliseconds: 200), () {
+                      setState(() {
+                        isStatisticsOpen = false;
+                      });
+                    });
+                  },
+                  resetStats: () async {
+                    await StatsUtil.resetStats(boardSize: boardSize);
+                  },
+                ),
+              ),
             ),
           ],
         ),

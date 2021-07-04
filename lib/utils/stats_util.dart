@@ -1,8 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:puzzlers/models/board.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
 
 class StatsUtil {
   static Map<Board, dynamic> _bestScores = {
@@ -86,5 +85,26 @@ class StatsUtil {
     });
     Board board = Board.values.first.board(boardSize);
     await prefs.setString(_stats[board], result);
+  }
+
+  static Future<void> resetStats({required boardSize}) async {
+    final prefs = await SharedPreferences.getInstance();
+    String result = await json.encode({
+      'games': 0,
+      'minTaps': 0,
+      'maxTaps': 0,
+      'minTime': '0:00',
+      'maxTime': '0:00',
+    });
+    Board board = Board.values.first.board(boardSize);
+    await prefs.setString(_stats[board], result);
+
+    updateBestScore(
+      newScore:{
+        'taps': '0',
+        'time': '0:00',
+      },
+      boardSize: boardSize,
+    );
   }
 }

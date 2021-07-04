@@ -1,40 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlers/constants/color_consts.dart';
+import 'package:puzzlers/models/device.dart';
 import 'package:puzzlers/providers/update_puzzles_provider.dart';
+import 'package:puzzlers/utils/screen_util.dart';
 import 'package:puzzlers/widgets/custom_button.dart';
 import 'package:puzzlers/widgets/custom_text.dart';
-
-enum Device {
-  ProMax,
-  Pro,
-  Mini,
-  SE2nd,
-  Plus8,
-}
-
-const Map<Device, Map<String, double>> devicesHeight = const {
-  Device.ProMax: {
-    'height': 896,
-    'coef': 0.41,
-  },
-  Device.Pro: {
-    'height': 844,
-    'coef': 0.45,
-  },
-  Device.Mini: {
-    'height': 812,
-    'coef': 0.46,
-  },
-  Device.Plus8: {
-    'height': 736,
-    'coef': 0.50,
-  },
-  Device.SE2nd: {
-    'height': 667,
-    'coef': 0.53,
-  },
-};
 
 final String bodyImage = 'assets/textures/wood_02.jpg';
 
@@ -60,27 +31,22 @@ class Congratulations extends StatefulWidget {
 
 class _CongratulationsState extends State<Congratulations> {
   final int duration = 200;
+  Device? device;
+  bool firstInit = true;
 
-  Device _checkDevice(double height) {
-    if (height >= devicesHeight[Device.ProMax]!['height']!) {
-      return Device.ProMax;
-    } else if (height >= devicesHeight[Device.Pro]!['height']!) {
-      return Device.Pro;
-    } else if (height >= devicesHeight[Device.Mini]!['height']!) {
-      return Device.Mini;
-    } else if (height >= devicesHeight[Device.Plus8]!['height']!) {
-      return Device.Plus8;
-    } else if (height >= devicesHeight[Device.SE2nd]!['height']!) {
-      return Device.SE2nd;
-    } else {
-      return Device.SE2nd;
+  @override
+  void didChangeDependencies() {
+    if (firstInit) {
+      var size = MediaQuery.of(context).size;
+      device = ScreenUtil.checkDevice(size.height);
+      firstInit = false;
     }
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    Device device = _checkDevice(size.height);
     Provider.of<UpdatePuzzlesProvider>(context);
     return AnimatedOpacity(
       duration: Duration(milliseconds: duration),
@@ -98,7 +64,7 @@ class _CongratulationsState extends State<Congratulations> {
             child: Center(
               child: Container(
                 width: size.width * 0.75,
-                height: size.height * devicesHeight[device]!['coef']!,
+                height: size.height * ScreenUtil.devicesHeight[device]!['coef']!,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
                   boxShadow: [

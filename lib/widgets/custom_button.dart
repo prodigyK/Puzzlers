@@ -67,6 +67,7 @@ class CustomButton extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
+                borderRadius: BorderRadius.all(Radius.circular(bottomBoarder)),
                 onTap: onPressed,
                 highlightColor: Colors.brown.shade300.withOpacity(0.7),
               ),

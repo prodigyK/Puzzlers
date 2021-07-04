@@ -70,7 +70,7 @@ class PuzzleLogo extends StatelessWidget {
     required String imagePath,
     required String title,
     required double fontSize,
-    required BorderRadiusGeometry? borderRadius,
+    BorderRadiusGeometry? borderRadius,
     ColorFilter colorFilter = const ColorFilter.mode(
       Colors.brown,
       BlendMode.saturation,
