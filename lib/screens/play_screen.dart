@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlers/constants/color_consts.dart';
 import 'package:puzzlers/constants/icons_consts.dart';
@@ -13,6 +12,7 @@ import 'package:puzzlers/providers/update_puzzles_provider.dart';
 import 'package:puzzlers/providers/update_timer_provider.dart';
 import 'package:puzzlers/utils/calc_util.dart';
 import 'package:puzzlers/utils/screen_util.dart';
+import 'package:puzzlers/utils/sound_util.dart';
 import 'package:puzzlers/utils/stats_util.dart';
 import 'package:puzzlers/widgets/congratulation.dart';
 import 'package:puzzlers/widgets/custom_decorated_button.dart';
@@ -21,7 +21,6 @@ import 'package:puzzlers/widgets/custom_text.dart';
 import 'package:puzzlers/widgets/puzzle.dart';
 import 'package:puzzlers/widgets/statistics.dart';
 import 'package:sprintf/sprintf.dart';
-import 'package:soundpool/soundpool.dart';
 
 typedef ShuffleBoard = void Function();
 
@@ -46,8 +45,7 @@ class _PlayScreenState extends State<PlayScreen> {
   bool isMute = false;
   bool isStarted = false;
   bool isShuffleDisabled = false;
-  Soundpool? sound;
-  int? soundId;
+  SoundUtil? soundUtil;
   bool isCongratulate = false;
   Congratulations? congratulationWidget;
   Map<Board, double> puzzleSizeDelta = {
@@ -107,8 +105,8 @@ class _PlayScreenState extends State<PlayScreen> {
   @override
   void initState() {
     super.initState();
-    sound = Soundpool.fromOptions(options: SoundpoolOptions(streamType: StreamType.notification));
-    _loadSound().then((value) => soundId = value);
+    soundUtil = SoundUtil();
+    soundUtil?.init();
   }
 
   void _shufflePuzzles() {
@@ -238,7 +236,7 @@ class _PlayScreenState extends State<PlayScreen> {
         }
       }
     }
-    _playSound();
+    soundUtil?.playSound();
     Provider.of<UpdatePuzzlesProvider>(context, listen: false).update();
     bool isFinish = CalcUtil.calculateFinalSet(
       boardSize: boardSize,
@@ -315,17 +313,6 @@ class _PlayScreenState extends State<PlayScreen> {
     });
   }
 
-  Future<int?> _loadSound() async {
-    var asset = await rootBundle.load("assets/sounds/arm_09.wav");
-    return await sound?.load(asset);
-  }
-
-  void _playSound() async {
-    if (!isMute) {
-      await sound?.play(soundId!);
-    }
-  }
-
   void _closeCongratulationDialog() {
     setState(() {
       isCongratulate = false;
@@ -340,7 +327,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
   @override
   void dispose() {
-    sound?.release();
+    soundUtil?.release();
     super.dispose();
   }
 
@@ -546,6 +533,13 @@ class _PlayScreenState extends State<PlayScreen> {
                               onTap: () {
                                 setState(() {
                                   isMute = !isMute;
+                                  if(isMute) {
+                                    soundUtil?.release();
+                                    soundUtil = null;
+                                  } else {
+                                    soundUtil = SoundUtil();
+                                    soundUtil?.init();
+                                  }
                                 });
                               },
                             ),
