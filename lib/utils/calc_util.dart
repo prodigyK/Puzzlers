@@ -21,7 +21,6 @@ class CalcUtil {
           puzzleNumbers[i + 1] = 0;
         }
       }
-      print(puzzleNumbers);
     } while (!CalcUtil.checkMatrixResolvable(
       boardSize: boardSize,
       puzzleNumbers: puzzleNumbers,

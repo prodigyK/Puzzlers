@@ -30,6 +30,8 @@ class MyApp extends StatelessWidget {
               return PageTransition(
                 child: PlayScreen(),
                 type: PageTransitionType.fade,
+                duration: Duration(milliseconds: 300),
+                alignment: Alignment.bottomCenter,
                 settings: settings,
               );
               break;

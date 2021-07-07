@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:puzzlers/constants/color_consts.dart';
+import 'package:puzzlers/models/board.dart';
 import 'package:puzzlers/screens/play_screen.dart';
 import 'package:puzzlers/widgets/custom_text.dart';
 import 'package:puzzlers/widgets/puzzle_logo.dart';
@@ -52,25 +53,25 @@ class MainScreen extends StatelessWidget {
                 _buildMenuItem(
                   context: context,
                   title: 'Small  3 x 3',
-                  boardSize: BoardSize.SMALL,
+                  boardSize: Board.THREE,
                 ),
                 SizedBox(height: 20),
                 _buildMenuItem(
                   context: context,
                   title: 'Classic  4 x 4',
-                  boardSize: BoardSize.CLASSIC,
+                  boardSize: Board.FOUR,
                 ),
                 SizedBox(height: 20),
                 _buildMenuItem(
                   context: context,
                   title: 'Large  5 x 5',
-                  boardSize: BoardSize.LARGE,
+                  boardSize: Board.FIVE,
                 ),
                 SizedBox(height: 20),
                 _buildMenuItem(
                   context: context,
                   title: 'Pro  6 x 6',
-                  boardSize: BoardSize.PRO,
+                  boardSize: Board.SIX,
                 ),
                 SizedBox(height: 20),
               ],
@@ -81,8 +82,7 @@ class MainScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(
-      {required BuildContext context, required String title, BoardSize boardSize = BoardSize.CLASSIC}) {
+  Widget _buildMenuItem({required BuildContext context, required String title, Board boardSize = Board.FOUR}) {
     var size = MediaQuery.of(context).size;
     return Container(
       width: size.width * 0.9,
@@ -130,20 +130,10 @@ class MainScreen extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.all(Radius.circular(25)),
                 onTap: () {
-                  switch (boardSize) {
-                    case BoardSize.SMALL:
-                      Navigator.of(context).pushNamed(PlayScreen.routeName, arguments: {'boardSize': 3});
-                      break;
-                    case BoardSize.CLASSIC:
-                      Navigator.of(context).pushNamed(PlayScreen.routeName, arguments: {'boardSize': 4});
-                      break;
-                    case BoardSize.LARGE:
-                      Navigator.of(context).pushNamed(PlayScreen.routeName, arguments: {'boardSize': 5});
-                      break;
-                    case BoardSize.PRO:
-                      Navigator.of(context).pushNamed(PlayScreen.routeName, arguments: {'boardSize': 6});
-                      break;
-                  }
+                  int board = boardSize.value;
+                  Future.delayed(Duration(milliseconds: 100), () {
+                    Navigator.of(context).pushNamed(PlayScreen.routeName, arguments: {'boardSize': board});
+                  });
                 },
                 highlightColor: Colors.brown.shade300.withOpacity(0.5),
               ),
