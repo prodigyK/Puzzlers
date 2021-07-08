@@ -6,7 +6,7 @@ import 'package:puzzlers/constants/color_consts.dart';
 import 'package:puzzlers/models/board.dart';
 import 'package:puzzlers/models/coord.dart';
 import 'package:puzzlers/providers/update_puzzles_provider.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:puzzlers/widgets/custom_text.dart';
 
 class Puzzle extends StatefulWidget {
   Coord coord;
@@ -37,10 +37,10 @@ class _PuzzleState extends State<Puzzle> {
   double x = -1;
   double y = -1;
   Map<Board, double> fontSizes = {
-    Board.THREE: 65,
-    Board.FOUR: 55,
-    Board.FIVE: 40,
-    Board.SIX: 33,
+    Board.THREE: 70,
+    Board.FOUR: 50,
+    Board.FIVE: 35,
+    Board.SIX: 28,
   };
   Board? board;
 
@@ -102,22 +102,14 @@ class _PuzzleState extends State<Puzzle> {
             ],
           ),
           child: Center(
-            child: Text(
-              '${widget.puzzleNumber}',
-              style: GoogleFonts.candal(
-                textStyle: TextStyle(
-                  color: ColorConsts.textColor,
-                  fontSize: fontSizes[board],
-                  fontWeight: FontWeight.w800,
-                  shadows: [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 1,
-                      offset: Offset(-1, -1),
-                    ),
-                  ],
-                ),
-              ),
+            child: CustomText(
+              title: '${widget.puzzleNumber}',
+              color: ColorConsts.textColor,
+              fontSize: fontSizes[board]!,
+              fontFamily: 'Candal',
+              fontWeight: FontWeight.w800,
+              shadowOffset1: -1,
+              blurRadius: 1,
             ),
           ),
         ),

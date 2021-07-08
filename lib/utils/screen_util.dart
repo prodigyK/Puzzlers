@@ -11,8 +11,8 @@ class ScreenUtil {
     },
     Device.Pro: {
       'height': 844,
-      'coef': 0.45,
-      'stat': 0.43,
+      'coef': 0.44,
+      'stat': 0.42,
     },
     Device.Mini: {
       'height': 812,

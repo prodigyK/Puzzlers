@@ -155,18 +155,22 @@ class _StatisticsState extends State<Statistics> {
                               final dialog = CupertinoAlertDialog(
                                 title: CustomText(
                                   title: 'Reset Statistics',
-                                  fontSize: 18,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                   color: Colors.red.shade700,
                                 ),
                                 content: CustomText(
                                   title: 'Are you sure you want to reset your statistics?',
-                                  fontSize: 14,
+                                  fontSize: 18,
                                 ),
                                 actions: [
                                   CupertinoDialogAction(
                                     child: Text(
                                       'Yes',
-                                      style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: Colors.red.shade700,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     isDefaultAction: false,
                                     onPressed: () async {
@@ -178,7 +182,10 @@ class _StatisticsState extends State<Statistics> {
                                   CupertinoDialogAction(
                                     child: Text(
                                       'No',
-                                      style: TextStyle(color: Colors.brown.shade700, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: Colors.brown.shade700,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     isDefaultAction: true,
                                     onPressed: () {

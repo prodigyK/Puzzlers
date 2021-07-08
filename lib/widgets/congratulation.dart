@@ -120,14 +120,14 @@ class _CongratulationsState extends State<Congratulations> {
                             child: widget.isBetter
                                 ? CustomText(
                                     title: 'Your current result is the best one!',
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
                                     color: Colors.green.shade700,
                                   )
                                 : CustomText(
                                     title: 'Do as few moves as possible!',
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
                                     color: Colors.indigo,
                                   ),
                           ),
@@ -185,54 +185,75 @@ class _CongratulationsState extends State<Congratulations> {
           label: CustomText(
             title: 'Scores',
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w800,
+            fontFamily: 'Candal',
           ),
         ),
         DataColumn(
           label: CustomText(
             title: 'Taps',
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'Candal',
           ),
         ),
         DataColumn(
           label: CustomText(
             title: 'Time',
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'Candal',
           ),
         ),
       ],
       rows: [
         DataRow(cells: [
-          DataCell(CustomText(title: 'Current', fontSize: 16)),
+          DataCell(CustomText(
+            title: 'Current',
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Candal',
+          )),
           DataCell(
             CustomText(
               title: '${widget.currentScore["taps"]}',
-              fontSize: 24,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Candal',
               color: widget.isBetter ? Colors.green.shade700 : Colors.indigo,
             ),
           ),
           DataCell(
             CustomText(
               title: '${widget.currentScore["time"]}',
-              fontSize: 20,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Candal',
               color: widget.isBetter ? Colors.green.shade700 : Colors.indigo,
             ),
           ),
         ]),
         DataRow(cells: [
-          DataCell(CustomText(title: 'Best', fontSize: 16)),
+          DataCell(CustomText(
+            title: 'Best',
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Candal',
+          )),
           DataCell(
             CustomText(
               title: '${widget.bestScore["taps"]}',
-              fontSize: 24,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Candal',
             ),
           ),
           DataCell(
             CustomText(
               title: '${widget.bestScore["time"]}',
-              fontSize: 20,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Candal',
             ),
           ),
         ]),
