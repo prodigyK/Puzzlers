@@ -19,9 +19,9 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("assets/textures/wood_02.jpg"),
+      decoration: const BoxDecoration(
+        image: const DecorationImage(
+          image: const AssetImage("assets/textures/wood_02.jpg"),
           fit: BoxFit.contain,
           repeat: ImageRepeat.repeat,
           colorFilter: const ColorFilter.mode(
@@ -91,11 +91,11 @@ class MainScreen extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(25)),
+              decoration: const BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(25)),
                 color: Colors.transparent,
                 image: DecorationImage(
-                  image: AssetImage(buttonBgImage),
+                  image: const AssetImage(buttonBgImage),
                   fit: BoxFit.contain,
                   repeat: ImageRepeat.repeat,
                   matchTextDirection: true,
@@ -104,7 +104,7 @@ class MainScreen extends StatelessWidget {
                     BlendMode.screen,
                   ),
                 ),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black38,
                     blurRadius: 2,
@@ -128,7 +128,7 @@ class MainScreen extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                borderRadius: BorderRadius.all(Radius.circular(25)),
+                borderRadius: const BorderRadius.all(Radius.circular(25)),
                 onTap: () {
                   int board = boardSize.value;
                   Future.delayed(Duration(milliseconds: 100), () {

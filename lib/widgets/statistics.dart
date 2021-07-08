@@ -66,7 +66,7 @@ class _StatisticsState extends State<Statistics> {
             ),
           ),
           onTap: () {
-            Future.delayed(Duration(milliseconds: 200), () {
+            Future.delayed(const Duration(milliseconds: 200), () {
               widget.closeDialog();
             });
           },
@@ -78,7 +78,7 @@ class _StatisticsState extends State<Statistics> {
               height: size.height * ScreenUtil.devicesHeight[widget.device]!['stat']!,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black,
                     blurRadius: 20,
@@ -107,8 +107,10 @@ class _StatisticsState extends State<Statistics> {
                           height: 65,
                           decoration: BoxDecoration(
                             color: Colors.brown.shade400.withOpacity(0.3),
-                            borderRadius:
-                                BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25),
+                            ),
                           ),
                           child: Center(
                             child: CustomText(
@@ -124,7 +126,7 @@ class _StatisticsState extends State<Statistics> {
                         ),
                         SizedBox(height: 10),
                         Container(
-                          margin: EdgeInsets.symmetric(horizontal: 30.0),
+                          margin: const EdgeInsets.symmetric(horizontal: 30.0),
                           child: Column(
                             children: [
                               _rowStat(title: 'Games', value: stats?['games'].toString() ?? '0'),
@@ -203,7 +205,7 @@ class _StatisticsState extends State<Statistics> {
                           title: 'Close',
                           bottomBoarder: 25,
                           onPressed: () {
-                            Future.delayed(Duration(milliseconds: 200), () {
+                            Future.delayed(const Duration(milliseconds: 200), () {
                               widget.closeDialog();
                             });
                           },

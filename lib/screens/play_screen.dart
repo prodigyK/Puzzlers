@@ -449,8 +449,8 @@ class _PlayScreenState extends State<PlayScreen> {
                                 color: ColorConsts.boardBorderColor,
                                 border: Border.all(color: ColorConsts.boardBorderColor),
                                 borderRadius: BorderRadius.circular(25),
-                                image: DecorationImage(
-                                  image: AssetImage("assets/textures/wood_05.jpg"),
+                                image: const DecorationImage(
+                                  image: const AssetImage("assets/textures/wood_05.jpg"),
                                   fit: BoxFit.contain,
                                   colorFilter: const ColorFilter.mode(
                                     Colors.brown,
@@ -472,13 +472,12 @@ class _PlayScreenState extends State<PlayScreen> {
                               child: Container(
                                 width: boardSizeInner,
                                 height: boardSizeInner,
-                                padding: EdgeInsets.all(0),
                                 decoration: BoxDecoration(
                                   color: ColorConsts.textColor,
                                   border: Border.all(color: ColorConsts.boardBorderColor),
                                   borderRadius: BorderRadius.circular(10),
-                                  image: DecorationImage(
-                                    image: AssetImage("assets/textures/wood_02.jpg"),
+                                  image: const DecorationImage(
+                                    image: const AssetImage("assets/textures/wood_02.jpg"),
                                     fit: BoxFit.contain,
                                     repeat: ImageRepeat.repeat,
                                     colorFilter: const ColorFilter.mode(
@@ -533,7 +532,7 @@ class _PlayScreenState extends State<PlayScreen> {
                               onTap: () {
                                 setState(() {
                                   isMute = !isMute;
-                                  if(isMute) {
+                                  if (isMute) {
                                     soundUtil?.release();
                                     soundUtil = null;
                                   } else {
