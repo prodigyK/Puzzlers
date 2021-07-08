@@ -20,6 +20,12 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        builder: (context, child) {
+          return MediaQuery(
+            child: child!,
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          );
+        },
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -34,7 +40,6 @@ class MyApp extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 settings: settings,
               );
-              break;
             default:
               return null;
           }
