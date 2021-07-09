@@ -13,7 +13,6 @@ class PuzzleEmpty extends StatelessWidget {
     return Container(
       width: puzzleSize,
       height: puzzleSize,
-      margin: EdgeInsets.all(0),
     );
   }
 }

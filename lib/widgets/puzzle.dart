@@ -58,7 +58,7 @@ class _PuzzleState extends State<Puzzle> {
     return AnimatedPositioned(
       top: y,
       left: x,
-      duration: widget.isShuffled ? Duration(milliseconds: 1000) : Duration(milliseconds: 100),
+      duration: widget.isShuffled ? const Duration(milliseconds: 1000) : const Duration(milliseconds: 100),
       curve: widget.isShuffled ? Curves.easeInOut : Curves.easeOut,
       child: GestureDetector(
         onTap: () {
@@ -71,19 +71,18 @@ class _PuzzleState extends State<Puzzle> {
         child: Container(
           width: widget.puzzleSize,
           height: widget.puzzleSize,
-          margin: EdgeInsets.all(0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: Colors.transparent,
-            image: DecorationImage(
-              image: AssetImage("assets/textures/wood_05.jpg"),
+            image: const DecorationImage(
+              image: const AssetImage("assets/textures/wood_05.jpg"),
               fit: BoxFit.contain,
               colorFilter: const ColorFilter.mode(
                 Colors.brown,
                 BlendMode.saturation,
               ),
             ),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: Colors.black,
                 blurRadius: 1,
@@ -101,16 +100,14 @@ class _PuzzleState extends State<Puzzle> {
               ),
             ],
           ),
-          child: Center(
-            child: CustomText(
-              title: '${widget.puzzleNumber}',
-              color: ColorConsts.textColor,
-              fontSize: fontSizes[board]!,
-              fontFamily: 'Candal',
-              fontWeight: FontWeight.w800,
-              shadowOffset1: -1,
-              blurRadius: 1,
-            ),
+          child: CustomText(
+            title: '${widget.puzzleNumber}',
+            color: ColorConsts.textColor,
+            fontSize: fontSizes[board]!,
+            fontFamily: 'Candal',
+            fontWeight: FontWeight.w800,
+            shadowOffset1: -1,
+            blurRadius: 1,
           ),
         ),
       ),

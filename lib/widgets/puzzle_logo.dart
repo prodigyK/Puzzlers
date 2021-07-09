@@ -23,7 +23,7 @@ class PuzzleLogo extends StatelessWidget {
               imagePath: 'assets/textures/wood_04.jpg',
               width: 75,
               height: 75,
-              borderRadius: BorderRadius.only(topRight: Radius.circular(25)),
+              borderRadius: const BorderRadius.only(topRight: Radius.circular(25)),
             ),
           ),
           Positioned(
@@ -35,7 +35,7 @@ class PuzzleLogo extends StatelessWidget {
                 imagePath: 'assets/textures/wood_02.jpg',
                 width: 75,
                 height: 75,
-                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25))
+                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(25))
             ),
           ),
           Positioned(
@@ -47,7 +47,7 @@ class PuzzleLogo extends StatelessWidget {
                 imagePath: 'assets/textures/wood_05.jpg',
                 width: 75,
                 height: 75,
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(25))
+                borderRadius: const BorderRadius.only(bottomRight: Radius.circular(25))
             ),
           ),
           _buildContainer(
@@ -81,7 +81,7 @@ class PuzzleLogo extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: Colors.brown.shade600,
-        borderRadius: borderRadius,//BorderRadius.only(topRight: Radius.circular(25)),
+        borderRadius: borderRadius,
         image: DecorationImage(
           image: AssetImage(imagePath),
           fit: BoxFit.contain,
