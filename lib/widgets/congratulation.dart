@@ -30,7 +30,7 @@ class Congratulations extends StatefulWidget {
 }
 
 class _CongratulationsState extends State<Congratulations> {
-  final int duration = 200;
+  static const int _DURATION = 200;
   Device? device;
   bool firstInit = true;
 
@@ -49,7 +49,7 @@ class _CongratulationsState extends State<Congratulations> {
     var size = MediaQuery.of(context).size;
     Provider.of<UpdatePuzzlesProvider>(context);
     return AnimatedOpacity(
-      duration: Duration(milliseconds: duration),
+      duration: const Duration(milliseconds: _DURATION),
       opacity: widget.isVisible ? 1.0 : 0.0,
       child: Stack(
         children: [
@@ -96,8 +96,10 @@ class _CongratulationsState extends State<Congratulations> {
                             height: 65,
                             decoration: BoxDecoration(
                               color: Colors.brown.shade400.withOpacity(0.3),
-                              borderRadius:
-                                  BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(25),
+                                topRight: Radius.circular(25),
+                              ),
                             ),
                             child: Center(
                               child: CustomText(
@@ -132,8 +134,7 @@ class _CongratulationsState extends State<Congratulations> {
                                   ),
                           ),
                           Container(
-                            width: 200,
-                            height: size.height * 0.19,
+                            width: ScreenUtil.devicesHeight[device]!['width']!,
                             child: FittedBox(
                               fit: BoxFit.cover,
                               child: _buildDataTable(),
@@ -146,7 +147,7 @@ class _CongratulationsState extends State<Congratulations> {
                               setState(() {
                                 widget.isVisible = false;
                               });
-                              Future.delayed(Duration(milliseconds: duration), () {
+                              Future.delayed(Duration(milliseconds: _DURATION), () {
                                 widget.closeDialog();
                               });
                             },

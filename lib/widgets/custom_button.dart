@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:puzzlers/models/device.dart';
+import 'package:puzzlers/utils/screen_util.dart';
 import 'package:puzzlers/widgets/custom_text.dart';
 
 typedef MyFuncAction = void Function();
@@ -21,9 +23,11 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    Device device = ScreenUtil.checkDevice(size.height);
     return Container(
       width: double.infinity,
-      height: 50,
+      height: ScreenUtil.devicesHeight[device]!['button']!,
       child: Stack(
         children: [
           Positioned.fill(
