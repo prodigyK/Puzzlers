@@ -42,10 +42,9 @@ class _PlayScreenState extends State<PlayScreen> {
   double boardSizeOuter = 0.0;
   double boardSizeInner = 0.0;
   double puzzleSize = 0.0;
-  bool isMute = false;
+  bool isMuted = false;
   bool isStarted = false;
   bool isShuffleDisabled = false;
-  SoundUtil? soundUtil;
   bool isCongratulate = false;
   Congratulations? congratulationWidget;
   Map<Board, double> puzzleSizeDelta = {
@@ -59,7 +58,7 @@ class _PlayScreenState extends State<PlayScreen> {
   bool isStatisticsAnimatedSwitch = false;
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
 
     if (!firstInit) {
@@ -98,15 +97,15 @@ class _PlayScreenState extends State<PlayScreen> {
         distance: distanceBetweenPuzzles,
       );
       _generatePuzzleList(puzzleSize);
+
+      // Sound init
+      await SoundUtil.init();
+      setState(() {
+        isMuted = SoundUtil.isMuted;
+      });
+
       firstInit = true;
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    soundUtil = SoundUtil();
-    soundUtil?.init();
   }
 
   void _shufflePuzzles() {
@@ -198,7 +197,6 @@ class _PlayScreenState extends State<PlayScreen> {
       return false;
     }
 
-    List<Position> positions = [];
     if (isHorizontal) {
       if (posX < zeroPosX) {
         for (int i = zeroPosX - 1; i >= posX; i--) {
@@ -236,7 +234,7 @@ class _PlayScreenState extends State<PlayScreen> {
         }
       }
     }
-    soundUtil?.playSound();
+    SoundUtil.playSound();
     Provider.of<UpdatePuzzlesProvider>(context, listen: false).update();
     bool isFinish = CalcUtil.calculateFinalSet(
       boardSize: boardSize,
@@ -327,7 +325,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
   @override
   void dispose() {
-    soundUtil?.release();
+    SoundUtil.release();
     super.dispose();
   }
 
@@ -527,17 +525,16 @@ class _PlayScreenState extends State<PlayScreen> {
                             CustomDecoratedButton(
                               width: 70,
                               height: 70,
-                              icon: isMute ? IconConsts.volumeMute : IconConsts.volumeUp,
+                              icon: isMuted ? IconConsts.volumeMute : IconConsts.volumeUp,
                               iconSize: 30,
                               onTap: () {
                                 setState(() {
-                                  isMute = !isMute;
-                                  if (isMute) {
-                                    soundUtil?.release();
-                                    soundUtil = null;
+                                  isMuted = !isMuted;
+                                  SoundUtil.saveSettings(isMuted);
+                                  if (isMuted) {
+                                    SoundUtil.release();
                                   } else {
-                                    soundUtil = SoundUtil();
-                                    soundUtil?.init();
+                                    SoundUtil.init();
                                   }
                                 });
                               },
